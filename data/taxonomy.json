@@ -1,0 +1,125 @@
+{
+  "generatedAt": "2026-06-12",
+  "title": "Taxonomia de tipos de golpes",
+  "note": "As frequencias indicam presenca nas bases catalogadas, nao prevalencia real nacional. A base RNP/CAIS e especializada em phishing e tende a super-representar fraudes por e-mail, faturas, boletos e paginas falsas.",
+  "sources": [
+    {
+      "name": "RNP/CAIS - Catalogo de Fraudes",
+      "url": "https://catalogodefraudes.rnp.br/",
+      "knownCases": 2000,
+      "bias": "Fonte especializada em phishing e mensagens fraudulentas reportadas ou coletadas; nao representa todo o universo de golpes no Brasil."
+    }
+  ],
+  "categories": [
+    {
+      "id": "cobranca_fatura_boleto",
+      "name": "Cobranca, fatura e boleto falso",
+      "description": "Fraudes que simulam contas, mensalidades, boletos, faturas ou debitos em aberto para induzir pagamento ou clique em link falso.",
+      "knownCases": 656,
+      "share": 32.8,
+      "sourceBias": "Muito presente na RNP por causa de phishing por e-mail envolvendo faturas, telecom, streaming, boletos e dominio.",
+      "signals": ["boleto ou fatura inesperada", "segunda via urgente", "debito em aberto", "link para pagamento", "ameaca de cancelamento"],
+      "examples": ["Fatura Vivo/Claro/NET", "Boleto falso Nubank", "Pagamento Netflix", "Fatura Mercado Pago"]
+    },
+    {
+      "id": "banco_cartao_conta",
+      "name": "Banco, cartao e conta falsa",
+      "description": "Golpes que usam bancos, cartoes, tokens, Pix ou atualizacao cadastral para capturar credenciais ou induzir transferencia.",
+      "knownCases": 610,
+      "share": 30.5,
+      "sourceBias": "Muito frequente na RNP por e-mails falsos de bancos e programas de pontos.",
+      "signals": ["token ou iToken", "conta bloqueada", "sincronizacao de seguranca", "resgate de pontos", "cartao premium"],
+      "examples": ["Bradesco Prime", "Itau Personnalite", "Banco do Brasil", "Pix Caixa"]
+    },
+    {
+      "id": "fiscal_tributario",
+      "name": "Fiscal e tributario falso",
+      "description": "Mensagens que imitam Receita Federal, Simples Nacional, DAS/MEI, DARF, IRPF, ICMS, CNPJ ou notas fiscais.",
+      "knownCases": 475,
+      "share": 23.8,
+      "sourceBias": "Aparece muito em epocas de imposto e em campanhas de phishing contra empresas e MEIs.",
+      "signals": ["DAS/MEI", "DARF", "IRPF", "CNPJ irregular", "nota fiscal", "SEFAZ"],
+      "examples": ["Falso DAS Simples Nacional", "Divergencia no IRPF", "Nota Fiscal Eletronica", "Recolhimento ICMS"]
+    },
+    {
+      "id": "documento_anexo_download",
+      "name": "Documento, anexo e download malicioso",
+      "description": "Mensagens que oferecem curriculos, comprovantes, documentos assinados ou arquivos para download contendo links ou anexos maliciosos.",
+      "knownCases": 128,
+      "share": 6.4,
+      "sourceBias": "Bem representado em phishing por e-mail, especialmente contra empresas e areas administrativas.",
+      "signals": ["documento assinado", "curriculo", "comprovante", "orcamento", "arquivo para download"],
+      "examples": ["Curriculo falso", "Documento digital assinado", "Comprovante Pix", "Pedido de orcamento"]
+    },
+    {
+      "id": "email_webmail",
+      "name": "Conta de e-mail e webmail falsa",
+      "description": "Phishing que simula limite de armazenamento, expiracao de senha, bloqueio de e-mail ou validacao de webmail.",
+      "knownCases": 57,
+      "share": 2.9,
+      "sourceBias": "Mais frequente em ambientes institucionais e corporativos monitorados por fontes como a RNP.",
+      "signals": ["limite de armazenamento", "senha expirada", "validacao de e-mail", "webmail", "Zimbra"],
+      "examples": ["Webmail limite de armazenamento", "Suporte Zimbra", "Conta Outlook suspensa"]
+    },
+    {
+      "id": "judicial_advocacia",
+      "name": "Judicial e advocacia falsa",
+      "description": "Golpes que usam linguagem juridica, intimacoes, processos, cartorios, protestos ou acordos extrajudiciais.",
+      "knownCases": 42,
+      "share": 2.1,
+      "sourceBias": "Sub-representado na RNP em relacao a golpes por telefone e WhatsApp, mas aparece em e-mails de phishing.",
+      "signals": ["intimacao", "processo judicial", "audiencia", "cartorio", "protesto", "penhora"],
+      "examples": ["Falsa intimacao trabalhista", "Acordo extrajudicial", "Bloqueio judicial", "Certidao de protesto"]
+    },
+    {
+      "id": "outros_phishing",
+      "name": "Outros phishing generico",
+      "description": "Casos que ainda nao se encaixam bem em uma categoria consolidada e devem ser revistos conforme novas fontes entrarem.",
+      "knownCases": 21,
+      "share": 1.1,
+      "sourceBias": "Categoria residual; deve diminuir com uma taxonomia mais rica.",
+      "signals": ["mensagem generica", "link suspeito", "remetente estranho"],
+      "examples": ["Comunicados genericos", "Alerta falso de administrador"]
+    },
+    {
+      "id": "encomenda_frete",
+      "name": "Encomenda e frete falso",
+      "description": "Golpes que simulam entrega retida, taxa alfandegaria, Correios, Jadlog, DHL ou rastreamento falso.",
+      "knownCases": 6,
+      "share": 0.3,
+      "sourceBias": "Provavelmente subestimado na RNP em relacao ao volume real em SMS, WhatsApp e anuncios.",
+      "signals": ["encomenda retida", "taxa de entrega", "alfandega", "rastreamento", "Correios"],
+      "examples": ["Pedido retido", "Falsa taxa de entrega", "Encomenda Jadlog"]
+    },
+    {
+      "id": "transito_cnh_detran",
+      "name": "Transito, CNH e Detran falso",
+      "description": "Fraudes envolvendo multa, CNH, licenciamento, SENATRAN, pedagio ou notificacoes falsas de transito.",
+      "knownCases": 3,
+      "share": 0.1,
+      "sourceBias": "Subestimado na RNP; tende a aparecer mais em SMS, WhatsApp e campanhas regionais.",
+      "signals": ["multa", "CNH suspensa", "licenciamento", "pedagio", "SENATRAN"],
+      "examples": ["Falsa multa de transito", "Suspensao CNH"]
+    },
+    {
+      "id": "pontos_milhas_recompensas",
+      "name": "Pontos, milhas e recompensas falsas",
+      "description": "Golpes que prometem resgate de pontos, milhas, cashback, bonus ou beneficios de fidelidade.",
+      "knownCases": 1,
+      "share": 0.1,
+      "sourceBias": "Muito provavelmente subestimado na base RNP; comum em campanhas por WhatsApp, SMS e e-mail.",
+      "signals": ["resgate de pontos", "milhas", "cashback", "Livelo", "Smiles", "Esfera"],
+      "examples": ["Pontos Bradesco", "Santander Esfera", "Bonus Azul"]
+    },
+    {
+      "id": "doacao_premio_oferta",
+      "name": "Doacao, premio e oferta falsa",
+      "description": "Golpes que usam premio, cupom, promocao, doacao, sorteio ou oferta excepcional como isca.",
+      "knownCases": 1,
+      "share": 0.1,
+      "sourceBias": "Sub-representado na RNP porque muitas campanhas circulam por redes sociais e mensageria.",
+      "signals": ["premio", "cupom", "doacao", "promocao", "oferta imperdivel"],
+      "examples": ["Smart TV promocional", "Cupom Uber", "Programa de doacoes"]
+    }
+  ]
+}

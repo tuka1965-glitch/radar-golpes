@@ -481,6 +481,95 @@ th {
   background: #fbfdfc;
 }
 
+.note-text {
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 14px;
+}
+
+.taxonomy-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.taxonomy-summary span {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfc;
+  padding: 8px 10px;
+  color: var(--muted);
+}
+
+.taxonomy-summary strong {
+  color: var(--ink);
+}
+
+.taxonomy-list {
+  display: grid;
+  gap: 12px;
+}
+
+.taxonomy-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfc;
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.taxonomy-card-header,
+.taxonomy-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+}
+
+.taxonomy-card h3 {
+  margin: 3px 0 0;
+  font-size: 18px;
+}
+
+.taxonomy-card-header > strong {
+  font-size: 24px;
+  color: var(--accent-3);
+}
+
+.taxonomy-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--soft);
+  overflow: hidden;
+}
+
+.taxonomy-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent-3);
+}
+
+.taxonomy-detail {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.taxonomy-detail strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.bias-text {
+  border-left: 3px solid var(--amber);
+  padding-left: 10px;
+  color: var(--muted);
+}
+
 .report-form {
   display: grid;
   gap: 12px;
@@ -540,8 +629,8 @@ th {
     height: auto;
   }
 
-  .nav-tabs {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+.nav-tabs {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .topbar,
@@ -578,6 +667,11 @@ th {
   }
 
   .bar-row {
+    grid-template-columns: 1fr;
+  }
+
+  .taxonomy-card-header,
+  .taxonomy-detail {
     grid-template-columns: 1fr;
   }
 

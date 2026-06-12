@@ -20,6 +20,7 @@
           <button class="nav-item active" data-view="overview" type="button">Painel</button>
           <button class="nav-item" data-view="consulta" type="button">Consulta</button>
           <button class="nav-item" data-view="denuncia" type="button">Denuncia</button>
+          <button class="nav-item" data-view="tipos" type="button">Tipos de Golpes</button>
           <button class="nav-item" data-view="corporativo" type="button">Empresas</button>
         </nav>
         <div class="sidebar-panel">
@@ -296,6 +297,25 @@
             <section class="panel result-panel">
               <span class="eyebrow">Classificacao e risco</span>
               <div id="classificationResult" class="classification-box"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="tipos">
+          <div class="dashboard-grid">
+            <section class="panel wide">
+              <div class="section-title">
+                <div>
+                  <span class="eyebrow">Taxonomia de referencia</span>
+                  <h2>Tipos de golpes conhecidos</h2>
+                </div>
+              </div>
+              <p id="taxonomyNote" class="note-text"></p>
+              <div id="taxonomySummary" class="taxonomy-summary"></div>
+            </section>
+
+            <section class="panel wide">
+              <div id="taxonomyList" class="taxonomy-list"></div>
             </section>
           </div>
         </section>

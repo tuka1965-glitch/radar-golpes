@@ -17,6 +17,7 @@ const STORAGE_KEY = "radar-golpes-user-reports-v1";
 let userReports = [];
 let reports = [];
 let knownFrauds = [];
+let taxonomy = null;
 
 const cityPositions = {
   "Manaus": [22, 30],
@@ -144,6 +145,59 @@ function renderRows(data) {
       <td>${report.indicator}</td>
       <td><span class="risk ${report.risk}">${report.risk}</span></td>
     </tr>
+  `).join("");
+}
+
+async function loadTaxonomy() {
+  try {
+    const response = await fetch("data/taxonomy.json", { cache: "no-store" });
+    if (!response.ok) {
+      return;
+    }
+    taxonomy = await response.json();
+    renderTaxonomy();
+  } catch (error) {
+    taxonomy = null;
+  }
+}
+
+function renderTaxonomy() {
+  if (!taxonomy) {
+    return;
+  }
+  const categories = Array.isArray(taxonomy.categories) ? taxonomy.categories : [];
+  const totalCases = categories.reduce((sum, item) => sum + Number(item.knownCases || 0), 0);
+  const sourceNames = (taxonomy.sources || []).map((source) => source.name).join(", ");
+
+  $("#taxonomyNote").textContent = taxonomy.note || "";
+  $("#taxonomySummary").innerHTML = `
+    <span><strong>${categories.length}</strong> tipos</span>
+    <span><strong>${totalCases.toLocaleString("pt-BR")}</strong> casos catalogados</span>
+    <span><strong>${sourceNames || "Fontes em expansao"}</strong></span>
+  `;
+  $("#taxonomyList").innerHTML = categories.map((category) => `
+    <article class="taxonomy-card">
+      <div class="taxonomy-card-header">
+        <div>
+          <span class="eyebrow">${category.knownCases.toLocaleString("pt-BR")} casos conhecidos</span>
+          <h3>${category.name}</h3>
+        </div>
+        <strong>${Number(category.share || 0).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%</strong>
+      </div>
+      <p>${category.description}</p>
+      <div class="taxonomy-bar" aria-hidden="true"><span style="width:${category.share}%"></span></div>
+      <div class="taxonomy-detail">
+        <div>
+          <strong>Sinais comuns</strong>
+          <p>${(category.signals || []).join(", ")}</p>
+        </div>
+        <div>
+          <strong>Exemplos</strong>
+          <p>${(category.examples || []).join(", ")}</p>
+        </div>
+      </div>
+      <p class="bias-text">${category.sourceBias}</p>
+    </article>
   `).join("");
 }
 
@@ -333,5 +387,6 @@ function bindEvents() {
 loadUserReports();
 bindEvents();
 render();
+loadTaxonomy();
 renderLookup();
 loadKnownFrauds();
