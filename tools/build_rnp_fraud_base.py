@@ -174,8 +174,8 @@ def parse_index(html_text):
 def parse_detail(fraud_id, html_text):
     title = first_match(r"<h2>(.*?)</h2>", html_text)
     subject = first_match(r"<h4>\s*Assunto da mensagem:\s*(.*?)</h4>", html_text)
-    included_at = first_match(r"<h4>\s*Data de inclusão:\s*(.*?)</h4>", html_text)
-    description = first_match(r"<h4>\s*Data de inclusão:\s*.*?</h4>\s*<p>(.*?)</p>", html_text)
+    included_at = first_match(r"<h4>\s*Data de inclus(?:ão|&atilde;o|ao):\s*(.*?)</h4>", html_text)
+    description = first_match(r"<h4>\s*Data de inclus(?:ão|&atilde;o|ao):\s*.*?</h4>\s*<p>(.*?)</p>", html_text)
     message = clean_message_text(first_match(r"<pre>(.*?)</pre>", html_text))
     tags = all_matches(r'<a href="/frauds/tags/\d+"><i class="fa fa-tags"></i>(.*?)</a>', html_text)
     combined = "\n".join([title, subject, description, message, " ".join(tags)])
@@ -237,8 +237,8 @@ def build(args):
 
 def main():
     parser = argparse.ArgumentParser(description="Build a compact RNP fraud catalog JSON for the Radar de Golpes prototype.")
-    parser.add_argument("--limit", type=int, default=100, help="Maximum number of fraud records to collect.")
-    parser.add_argument("--max-pages", type=int, default=20, help="Maximum catalog pages to scan for IDs.")
+    parser.add_argument("--limit", type=int, default=500, help="Maximum number of fraud records to collect.")
+    parser.add_argument("--max-pages", type=int, default=80, help="Maximum catalog pages to scan for IDs.")
     parser.add_argument("--delay", type=float, default=0.2, help="Delay in seconds between HTTP requests.")
     parser.add_argument("--insecure-tls", action="store_true", help="Disable TLS certificate verification for environments with local CA issues.")
     parser.add_argument("--output", type=Path, default=Path("data/fraudes-rnp.json"))
