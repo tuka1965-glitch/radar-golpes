@@ -19,6 +19,7 @@ Depois acesse `http://127.0.0.1:8765/`.
 - Consulta preventiva por telefone, chave Pix, URL, CPF/CNPJ ou texto suspeito.
 - Base inicial de 2.000 fraudes conhecidas da RNP/CAIS em `data/fraudes-rnp.json`, gerada por `tools/build_rnp_fraud_base.py`.
 - Formulario de denuncia com UF, cidade aberta, idade, sexo, escolaridade, empresa, tipo de golpe, tipo de identificador e prejuizo estimado.
+- Denuncias feitas no formulario ficam salvas no `localStorage` do navegador para sobreviver ao F5 no prototipo estatico.
 - Classificacao simulada por regras para sugerir o enquadramento do texto e alimentar o painel.
 - Visao corporativa com monitoramento de marca, relatorios e API de risco.
 

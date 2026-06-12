@@ -1,4 +1,4 @@
-const reports = [
+const seedReports = [
   { date: "2026-06-12 10:20", uf: "SP", city: "Sao Paulo", category: "Falso banco", indicatorType: "site", indicator: "seguranca-banco-validar.com", risk: "alto", loss: 1800, company: "Banco", profile: "aposentado", channel: "WhatsApp", growth: 230 },
   { date: "2026-06-12 09:14", uf: "RJ", city: "Rio de Janeiro", category: "Falso advogado", indicatorType: "telefone", indicator: "+55 21 98822-4401", risk: "alto", loss: 4200, company: "Escritorio de advocacia", profile: "juridico", channel: "Telefone", growth: 190 },
   { date: "2026-06-11 18:35", uf: "MG", city: "Belo Horizonte", category: "Falso frete", indicatorType: "site", indicator: "rastreio-entrega24.net", risk: "medio", loss: 240, company: "Correios", profile: "universitario", channel: "SMS", growth: 82 },
@@ -13,6 +13,9 @@ const reports = [
   { date: "2026-06-07 17:42", uf: "AM", city: "Manaus", category: "Falsa loja", indicatorType: "site", indicator: "ofertas-relampago-br.com", risk: "baixo", loss: 180, company: "Loja ou marketplace", profile: "universitario", channel: "Site", growth: 22 }
 ];
 
+const STORAGE_KEY = "radar-golpes-user-reports-v1";
+let userReports = [];
+let reports = [];
 let knownFrauds = [];
 
 const cityPositions = {
@@ -32,6 +35,20 @@ const cityPositions = {
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 
 const $ = (selector) => document.querySelector(selector);
+
+function loadUserReports() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    userReports = Array.isArray(stored) ? stored : [];
+  } catch (error) {
+    userReports = [];
+  }
+  reports = [...userReports, ...seedReports];
+}
+
+function saveUserReports() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(userReports));
+}
 
 function normalizeSearchText(value) {
   return (value || "")
@@ -258,7 +275,13 @@ function addReport(event) {
   const loss = Number($("#reportLoss").value || 0);
   const category = selectedCategory || suggestedCategory;
   const newReport = {
-    date: "2026-06-12 15:30",
+    date: new Date().toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
     uf: $("#reportUf").value,
     city,
     category,
@@ -274,7 +297,9 @@ function addReport(event) {
     channel: /whatsapp/i.test(text) ? "WhatsApp" : "Texto",
     growth: 121
   };
-  reports.unshift(newReport);
+  userReports.unshift(newReport);
+  saveUserReports();
+  reports = [...userReports, ...seedReports];
   render();
   submitButton.classList.add("is-success");
   submitButton.textContent = "Denuncia enviada";
@@ -288,6 +313,7 @@ function addReport(event) {
     submitButton.classList.remove("is-success");
     submitButton.textContent = "Enviar denuncia";
   }, 2600);
+  $("#reportForm").reset();
 }
 
 function bindEvents() {
@@ -304,6 +330,7 @@ function bindEvents() {
   $("#reportForm").addEventListener("submit", addReport);
 }
 
+loadUserReports();
 bindEvents();
 render();
 renderLookup();

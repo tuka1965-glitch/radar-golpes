@@ -161,6 +161,7 @@
                   <label>
                     UF
                     <select id="reportUf" required>
+                      <option value="" selected>Selecione</option>
                       <option value="AC">AC - Acre</option>
                       <option value="AL">AL - Alagoas</option>
                       <option value="AP">AP - Amapa</option>
@@ -185,18 +186,18 @@
                       <option value="RO">RO - Rondonia</option>
                       <option value="RR">RR - Roraima</option>
                       <option value="SC">SC - Santa Catarina</option>
-                      <option value="SP" selected>SP - Sao Paulo</option>
+                      <option value="SP">SP - Sao Paulo</option>
                       <option value="SE">SE - Sergipe</option>
                       <option value="TO">TO - Tocantins</option>
                     </select>
                   </label>
                   <label>
                     Cidade
-                    <input id="reportCity" required value="Sao Paulo" />
+                    <input id="reportCity" required />
                   </label>
                   <label>
                     Idade
-                    <input id="reportAge" type="number" min="1" max="120" value="58" />
+                    <input id="reportAge" type="number" min="1" max="120" />
                   </label>
                   <label>
                     Sexo
@@ -277,7 +278,7 @@
                   </label>
                   <label>
                     Identificador suspeito
-                    <input id="reportIndicator" required value="+55 11 94002-7788" />
+                    <input id="reportIndicator" required />
                   </label>
                   <label>
                     Prejuizo estimado
@@ -286,7 +287,7 @@
                 </div>
                 <label>
                   Mensagem recebida
-                  <textarea id="reportText" required rows="6">Banco X informa: sua conta sera bloqueada. Regularize o Pix no link seguro.</textarea>
+                  <textarea id="reportText" required rows="6"></textarea>
                 </label>
                 <button id="reportSubmit" class="primary-button" type="submit">Enviar denuncia</button>
                 <div id="reportStatus" class="form-status" aria-live="polite"></div>
