@@ -27,23 +27,12 @@ const cityPositions = {
   "Porto Alegre": [47, 96]
 };
 
-const state = {
-  city: "todas",
-  profile: "todos",
-  company: "todos"
-};
-
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 
 const $ = (selector) => document.querySelector(selector);
 
 function filteredReports() {
-  return reports.filter((report) => {
-    const cityMatch = state.city === "todas" || report.city === state.city;
-    const profileMatch = state.profile === "todos" || report.profile === state.profile || report.profile === "todos";
-    const companyMatch = state.company === "todos" || report.company === state.company || report.company === "todos";
-    return cityMatch && profileMatch && companyMatch;
-  });
+  return reports;
 }
 
 function countBy(items, key) {
@@ -51,14 +40,6 @@ function countBy(items, key) {
     acc[item[key]] = (acc[item[key]] || 0) + 1;
     return acc;
   }, {});
-}
-
-function setOptions() {
-  const cities = [...new Set(reports.map((report) => report.city))].sort();
-  const formCompanies = Array.from(document.querySelectorAll("#reportCompany option")).map((option) => option.value);
-  const companies = [...new Set([...reports.map((report) => report.company), ...formCompanies].filter((company) => company !== "todos"))].sort();
-  $("#cityFilter").insertAdjacentHTML("beforeend", cities.map((city) => `<option value="${city}">${city}</option>`).join(""));
-  $("#companyFilter").insertAdjacentHTML("beforeend", companies.map((company) => `<option value="${company}">${company}</option>`).join(""));
 }
 
 function renderMetrics(data) {
@@ -200,6 +181,8 @@ function classifyReport(text) {
 
 function addReport(event) {
   event.preventDefault();
+  const submitButton = $("#reportSubmit");
+  const status = $("#reportStatus");
   const text = $("#reportText").value;
   const selectedCategory = $("#reportScamType").value;
   const suggestedCategory = classifyReport(text);
@@ -226,11 +209,18 @@ function addReport(event) {
   };
   reports.unshift(newReport);
   render();
+  submitButton.classList.add("is-success");
+  submitButton.textContent = "Denuncia enviada";
+  status.textContent = `Denuncia registrada com sucesso para ${newReport.city}/${newReport.uf}.`;
   $("#classificationResult").innerHTML = `
     <div class="finding"><strong>${category}</strong><p>Tipo informado na denuncia. Sugestao automatica pelo texto: ${suggestedCategory}.</p></div>
     <div class="finding"><strong>${newReport.indicatorType}</strong><p>${newReport.indicator} registrado para ${newReport.company} em ${newReport.city}/${newReport.uf}.</p></div>
     <div class="finding"><strong>${newReport.risk.toUpperCase()}</strong><p>O caso foi adicionado ao painel e passa a influenciar alertas, mapa e consulta preventiva.</p></div>
   `;
+  window.setTimeout(() => {
+    submitButton.classList.remove("is-success");
+    submitButton.textContent = "Enviar denuncia";
+  }, 2600);
 }
 
 function bindEvents() {
@@ -243,32 +233,10 @@ function bindEvents() {
     });
   });
 
-  $("#cityFilter").addEventListener("change", (event) => {
-    state.city = event.target.value;
-    render();
-  });
-  $("#profileFilter").addEventListener("change", (event) => {
-    state.profile = event.target.value;
-    render();
-  });
-  $("#companyFilter").addEventListener("change", (event) => {
-    state.company = event.target.value;
-    render();
-  });
-  $("#resetFilters").addEventListener("click", () => {
-    state.city = "todas";
-    state.profile = "todos";
-    state.company = "todos";
-    $("#cityFilter").value = "todas";
-    $("#profileFilter").value = "todos";
-    $("#companyFilter").value = "todos";
-    render();
-  });
   $("#lookupButton").addEventListener("click", renderLookup);
   $("#reportForm").addEventListener("submit", addReport);
 }
 
-setOptions();
 bindEvents();
 render();
 renderLookup();

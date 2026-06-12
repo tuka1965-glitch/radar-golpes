@@ -43,32 +43,6 @@
           </div>
         </header>
 
-        <section class="toolbar" aria-label="Filtros globais">
-          <label>
-            Cidade
-            <select id="cityFilter">
-              <option value="todas">Todas</option>
-            </select>
-          </label>
-          <label>
-            Perfil
-            <select id="profileFilter">
-              <option value="todos">Todos</option>
-              <option value="aposentado">Aposentados</option>
-              <option value="empreendedor">Empreendedores</option>
-              <option value="universitario">Universitarios</option>
-              <option value="juridico">Juridico</option>
-            </select>
-          </label>
-          <label>
-            Empresa
-            <select id="companyFilter">
-              <option value="todos">Todos</option>
-            </select>
-          </label>
-          <button id="resetFilters" class="ghost-button" type="button">Limpar</button>
-        </section>
-
         <section class="view active" id="overview">
           <div class="metric-grid">
             <article class="metric">
@@ -314,7 +288,8 @@
                   Mensagem recebida
                   <textarea id="reportText" required rows="6">Banco X informa: sua conta sera bloqueada. Regularize o Pix no link seguro.</textarea>
                 </label>
-                <button class="primary-button" type="submit">Enviar denuncia</button>
+                <button id="reportSubmit" class="primary-button" type="submit">Enviar denuncia</button>
+                <div id="reportStatus" class="form-status" aria-live="polite"></div>
               </form>
             </section>
             <section class="panel result-panel">

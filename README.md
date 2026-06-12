@@ -15,7 +15,7 @@ Depois acesse `http://127.0.0.1:8765/`.
 ## O que esta implementado
 
 - Painel com metricas, alertas, mapa simplificado, ranking de golpes e feed de denuncias.
-- Filtros por cidade, perfil e empresa usada no golpe.
+- Painel consolidado com as informacoes coletadas no formulario de denuncia.
 - Consulta preventiva por telefone, chave Pix, URL, CPF/CNPJ ou texto suspeito.
 - Formulario de denuncia com UF, cidade aberta, idade, sexo, escolaridade, empresa, tipo de golpe, tipo de identificador e prejuizo estimado.
 - Classificacao simulada por regras para sugerir o enquadramento do texto e alimentar o painel.

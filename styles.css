@@ -184,18 +184,6 @@ h2 {
   box-shadow: var(--shadow);
 }
 
-.toolbar {
-  display: flex;
-  align-items: end;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
-  margin-bottom: 20px;
-}
-
 label {
   display: grid;
   gap: 6px;
@@ -238,6 +226,11 @@ textarea {
   background: var(--accent);
   color: white;
   border-color: var(--accent);
+}
+
+.primary-button.is-success {
+  background: #246b3f;
+  border-color: #246b3f;
 }
 
 .view {
@@ -497,6 +490,13 @@ th {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+}
+
+.form-status {
+  min-height: 22px;
+  color: #246b3f;
+  font-size: 14px;
+  font-weight: 800;
 }
 
 .business-grid {
