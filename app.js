@@ -1,16 +1,16 @@
 const reports = [
-  { date: "2026-06-12 10:20", city: "Sao Paulo", category: "Falso banco", indicator: "seguranca-banco-validar.com", risk: "alto", loss: 1800, bank: "Banco X", profile: "aposentado", channel: "WhatsApp", growth: 230 },
-  { date: "2026-06-12 09:14", city: "Rio de Janeiro", category: "Falso advogado", indicator: "+55 21 98822-4401", risk: "alto", loss: 4200, bank: "todos", profile: "juridico", channel: "Telefone", growth: 190 },
-  { date: "2026-06-11 18:35", city: "Belo Horizonte", category: "Falso frete", indicator: "rastreio-entrega24.net", risk: "medio", loss: 240, bank: "Banco Y", profile: "universitario", channel: "SMS", growth: 82 },
-  { date: "2026-06-11 16:02", city: "Curitiba", category: "Marketplace", indicator: "pix-33990011", risk: "medio", loss: 650, bank: "Banco Z", profile: "empreendedor", channel: "Marketplace", growth: 64 },
-  { date: "2026-06-11 13:45", city: "Recife", category: "Falso INSS", indicator: "+55 81 97770-1221", risk: "alto", loss: 1100, bank: "Banco X", profile: "aposentado", channel: "WhatsApp", growth: 156 },
-  { date: "2026-06-10 21:30", city: "Goiania", category: "Falso leilao", indicator: "leilaobr-oficial.com", risk: "alto", loss: 7600, bank: "Banco Y", profile: "empreendedor", channel: "Site", growth: 110 },
-  { date: "2026-06-10 12:20", city: "Salvador", category: "Romance scam", indicator: "perfil_marcelo_78", risk: "medio", loss: 900, bank: "todos", profile: "todos", channel: "Rede social", growth: 45 },
-  { date: "2026-06-09 19:17", city: "Fortaleza", category: "Emprestimo fraudulento", indicator: "credito-facil-ja.org", risk: "alto", loss: 2300, bank: "Banco Z", profile: "empreendedor", channel: "Anuncio", growth: 138 },
-  { date: "2026-06-09 15:48", city: "Sao Paulo", category: "Falso Pix", indicator: "pix-11940027788", risk: "alto", loss: 530, bank: "Banco X", profile: "universitario", channel: "WhatsApp", growth: 98 },
-  { date: "2026-06-08 11:05", city: "Brasilia", category: "Falso imposto", indicator: "gov-regularizacao.info", risk: "medio", loss: 370, bank: "todos", profile: "empreendedor", channel: "E-mail", growth: 74 },
-  { date: "2026-06-08 08:33", city: "Porto Alegre", category: "Fraude do CEO", indicator: "financeiro-pagamentos@corp-mail.net", risk: "alto", loss: 12800, bank: "Banco Y", profile: "empreendedor", channel: "E-mail", growth: 88 },
-  { date: "2026-06-07 17:42", city: "Manaus", category: "Falsa loja", indicator: "ofertas-relampago-br.com", risk: "baixo", loss: 180, bank: "Banco Z", profile: "universitario", channel: "Site", growth: 22 }
+  { date: "2026-06-12 10:20", uf: "SP", city: "Sao Paulo", category: "Falso banco", indicatorType: "site", indicator: "seguranca-banco-validar.com", risk: "alto", loss: 1800, company: "Banco", profile: "aposentado", channel: "WhatsApp", growth: 230 },
+  { date: "2026-06-12 09:14", uf: "RJ", city: "Rio de Janeiro", category: "Falso advogado", indicatorType: "telefone", indicator: "+55 21 98822-4401", risk: "alto", loss: 4200, company: "Escritorio de advocacia", profile: "juridico", channel: "Telefone", growth: 190 },
+  { date: "2026-06-11 18:35", uf: "MG", city: "Belo Horizonte", category: "Falso frete", indicatorType: "site", indicator: "rastreio-entrega24.net", risk: "medio", loss: 240, company: "Correios", profile: "universitario", channel: "SMS", growth: 82 },
+  { date: "2026-06-11 16:02", uf: "PR", city: "Curitiba", category: "Marketplace", indicatorType: "chave pix", indicator: "pix-33990011", risk: "medio", loss: 650, company: "Loja ou marketplace", profile: "empreendedor", channel: "Marketplace", growth: 64 },
+  { date: "2026-06-11 13:45", uf: "PE", city: "Recife", category: "Falso INSS", indicatorType: "telefone", indicator: "+55 81 97770-1221", risk: "alto", loss: 1100, company: "INSS", profile: "aposentado", channel: "WhatsApp", growth: 156 },
+  { date: "2026-06-10 21:30", uf: "GO", city: "Goiania", category: "Falso leilao", indicatorType: "site", indicator: "leilaobr-oficial.com", risk: "alto", loss: 7600, company: "Empresa de leilao", profile: "empreendedor", channel: "Site", growth: 110 },
+  { date: "2026-06-10 12:20", uf: "BA", city: "Salvador", category: "Golpe do amor", indicatorType: "perfil em rede social", indicator: "perfil_marcelo_78", risk: "medio", loss: 900, company: "Outra empresa", profile: "todos", channel: "Rede social", growth: 45 },
+  { date: "2026-06-09 19:17", uf: "CE", city: "Fortaleza", category: "Emprestimo fraudulento", indicatorType: "site", indicator: "credito-facil-ja.org", risk: "alto", loss: 2300, company: "Banco", profile: "empreendedor", channel: "Anuncio", growth: 138 },
+  { date: "2026-06-09 15:48", uf: "SP", city: "Sao Paulo", category: "Falso Pix", indicatorType: "chave pix", indicator: "pix-11940027788", risk: "alto", loss: 530, company: "Banco", profile: "universitario", channel: "WhatsApp", growth: 98 },
+  { date: "2026-06-08 11:05", uf: "DF", city: "Brasilia", category: "Falso imposto", indicatorType: "site", indicator: "gov-regularizacao.info", risk: "medio", loss: 370, company: "Receita Federal", profile: "empreendedor", channel: "E-mail", growth: 74 },
+  { date: "2026-06-08 08:33", uf: "RS", city: "Porto Alegre", category: "Fraude do CEO", indicatorType: "e-mail", indicator: "financeiro-pagamentos@corp-mail.net", risk: "alto", loss: 12800, company: "Outra empresa", profile: "empreendedor", channel: "E-mail", growth: 88 },
+  { date: "2026-06-07 17:42", uf: "AM", city: "Manaus", category: "Falsa loja", indicatorType: "site", indicator: "ofertas-relampago-br.com", risk: "baixo", loss: 180, company: "Loja ou marketplace", profile: "universitario", channel: "Site", growth: 22 }
 ];
 
 const cityPositions = {
@@ -30,7 +30,7 @@ const cityPositions = {
 const state = {
   city: "todas",
   profile: "todos",
-  bank: "todos"
+  company: "todos"
 };
 
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
@@ -41,8 +41,8 @@ function filteredReports() {
   return reports.filter((report) => {
     const cityMatch = state.city === "todas" || report.city === state.city;
     const profileMatch = state.profile === "todos" || report.profile === state.profile || report.profile === "todos";
-    const bankMatch = state.bank === "todos" || report.bank === state.bank || report.bank === "todos";
-    return cityMatch && profileMatch && bankMatch;
+    const companyMatch = state.company === "todos" || report.company === state.company || report.company === "todos";
+    return cityMatch && profileMatch && companyMatch;
   });
 }
 
@@ -55,16 +55,17 @@ function countBy(items, key) {
 
 function setOptions() {
   const cities = [...new Set(reports.map((report) => report.city))].sort();
-  const banks = [...new Set(reports.map((report) => report.bank).filter((bank) => bank !== "todos"))].sort();
+  const formCompanies = Array.from(document.querySelectorAll("#reportCompany option")).map((option) => option.value);
+  const companies = [...new Set([...reports.map((report) => report.company), ...formCompanies].filter((company) => company !== "todos"))].sort();
   $("#cityFilter").insertAdjacentHTML("beforeend", cities.map((city) => `<option value="${city}">${city}</option>`).join(""));
-  $("#bankFilter").insertAdjacentHTML("beforeend", banks.map((bank) => `<option value="${bank}">${bank}</option>`).join(""));
+  $("#companyFilter").insertAdjacentHTML("beforeend", companies.map((company) => `<option value="${company}">${company}</option>`).join(""));
 }
 
 function renderMetrics(data) {
   const highRisk = data.filter((report) => report.risk === "alto").length;
   const loss = data.reduce((sum, report) => sum + report.loss, 0);
   const pix = data.filter((report) => /pix/i.test(report.indicator) || /pix/i.test(report.category)).length;
-  const brands = new Set(data.map((report) => report.bank).filter((bank) => bank !== "todos")).size;
+  const brands = new Set(data.map((report) => report.company).filter((company) => company !== "todos")).size;
   const emerging = data.filter((report) => report.growth >= 100).length;
 
   $("#reportsTotal").textContent = data.length;
@@ -123,7 +124,7 @@ function renderRows(data) {
   $("#reportRows").innerHTML = data.slice(0, 8).map((report) => `
     <tr>
       <td>${report.date}</td>
-      <td>${report.city}</td>
+      <td>${report.city}${report.uf ? `/${report.uf}` : ""}</td>
       <td>${report.category}</td>
       <td>${report.indicator}</td>
       <td><span class="risk ${report.risk}">${report.risk}</span></td>
@@ -143,7 +144,7 @@ function render() {
 function riskLookup(value) {
   const normalized = value.toLowerCase();
   const matches = reports.filter((report) => {
-    const corpus = `${report.indicator} ${report.category} ${report.bank} ${report.channel}`.toLowerCase();
+    const corpus = `${report.indicator} ${report.indicatorType || ""} ${report.category} ${report.company} ${report.channel}`.toLowerCase();
     return normalized.includes(report.indicator.toLowerCase()) || corpus.split(/[\s.-]+/).some((token) => token.length > 4 && normalized.includes(token));
   });
 
@@ -200,26 +201,34 @@ function classifyReport(text) {
 function addReport(event) {
   event.preventDefault();
   const text = $("#reportText").value;
-  const category = classifyReport(text);
+  const selectedCategory = $("#reportScamType").value;
+  const suggestedCategory = classifyReport(text);
   const indicator = $("#reportIndicator").value;
   const city = $("#reportCity").value;
   const loss = Number($("#reportLoss").value || 0);
+  const category = selectedCategory || suggestedCategory;
   const newReport = {
     date: "2026-06-12 15:30",
+    uf: $("#reportUf").value,
     city,
     category,
+    indicatorType: $("#reportIndicatorType").value,
     indicator,
-    risk: /pix|banco|bloqueada|advogado/i.test(text) ? "alto" : "medio",
+    risk: /pix|banco|bloqueada|advogado|inss|detran|boleto/i.test(`${text} ${category}`) ? "alto" : "medio",
     loss,
-    bank: /banco x/i.test(text) ? "Banco X" : "todos",
+    company: $("#reportCompany").value,
     profile: "todos",
+    age: $("#reportAge").value,
+    sex: $("#reportSex").value,
+    education: $("#reportEducation").value,
     channel: /whatsapp/i.test(text) ? "WhatsApp" : "Texto",
     growth: 121
   };
   reports.unshift(newReport);
   render();
   $("#classificationResult").innerHTML = `
-    <div class="finding"><strong>${category}</strong><p>Classificacao atribuida pela combinacao de termos, canal e identificador.</p></div>
+    <div class="finding"><strong>${category}</strong><p>Tipo informado na denuncia. Sugestao automatica pelo texto: ${suggestedCategory}.</p></div>
+    <div class="finding"><strong>${newReport.indicatorType}</strong><p>${newReport.indicator} registrado para ${newReport.company} em ${newReport.city}/${newReport.uf}.</p></div>
     <div class="finding"><strong>${newReport.risk.toUpperCase()}</strong><p>O caso foi adicionado ao painel e passa a influenciar alertas, mapa e consulta preventiva.</p></div>
   `;
 }
@@ -242,17 +251,17 @@ function bindEvents() {
     state.profile = event.target.value;
     render();
   });
-  $("#bankFilter").addEventListener("change", (event) => {
-    state.bank = event.target.value;
+  $("#companyFilter").addEventListener("change", (event) => {
+    state.company = event.target.value;
     render();
   });
   $("#resetFilters").addEventListener("click", () => {
     state.city = "todas";
     state.profile = "todos";
-    state.bank = "todos";
+    state.company = "todos";
     $("#cityFilter").value = "todas";
     $("#profileFilter").value = "todos";
-    $("#bankFilter").value = "todos";
+    $("#companyFilter").value = "todos";
     render();
   });
   $("#lookupButton").addEventListener("click", renderLookup);

@@ -61,8 +61,8 @@
             </select>
           </label>
           <label>
-            Banco
-            <select id="bankFilter">
+            Empresa
+            <select id="companyFilter">
               <option value="todos">Todos</option>
             </select>
           </label>
@@ -87,7 +87,7 @@
               <small>Reincidencia por identificador</small>
             </article>
             <article class="metric">
-              <span>Marcas usadas</span>
+              <span>Empresas usadas</span>
               <strong id="metricBrands">0</strong>
               <small>Bancos, lojas e orgaos publicos</small>
             </article>
@@ -138,7 +138,7 @@
                   <thead>
                     <tr>
                       <th>Data</th>
-                      <th>Cidade</th>
+                      <th>Cidade/UF</th>
                       <th>Tipo</th>
                       <th>Identificador</th>
                       <th>Risco</th>
@@ -179,31 +179,146 @@
               <div class="section-title">
                 <div>
                   <span class="eyebrow">Nova denuncia</span>
-                  <h2>IA classifica e cruza padroes</h2>
+                  <h2>Coleta estruturada e cruza padroes</h2>
                 </div>
               </div>
               <form id="reportForm" class="report-form">
-                <label>
-                  Cidade
-                  <input id="reportCity" required value="Sao Paulo" />
-                </label>
-                <label>
-                  Identificador suspeito
-                  <input id="reportIndicator" required value="+55 11 94002-7788" />
-                </label>
+                <div class="form-grid">
+                  <label>
+                    UF
+                    <select id="reportUf" required>
+                      <option value="AC">AC - Acre</option>
+                      <option value="AL">AL - Alagoas</option>
+                      <option value="AP">AP - Amapa</option>
+                      <option value="AM">AM - Amazonas</option>
+                      <option value="BA">BA - Bahia</option>
+                      <option value="CE">CE - Ceara</option>
+                      <option value="DF">DF - Distrito Federal</option>
+                      <option value="ES">ES - Espirito Santo</option>
+                      <option value="GO">GO - Goias</option>
+                      <option value="MA">MA - Maranhao</option>
+                      <option value="MT">MT - Mato Grosso</option>
+                      <option value="MS">MS - Mato Grosso do Sul</option>
+                      <option value="MG">MG - Minas Gerais</option>
+                      <option value="PA">PA - Para</option>
+                      <option value="PB">PB - Paraiba</option>
+                      <option value="PR">PR - Parana</option>
+                      <option value="PE">PE - Pernambuco</option>
+                      <option value="PI">PI - Piaui</option>
+                      <option value="RJ">RJ - Rio de Janeiro</option>
+                      <option value="RN">RN - Rio Grande do Norte</option>
+                      <option value="RS">RS - Rio Grande do Sul</option>
+                      <option value="RO">RO - Rondonia</option>
+                      <option value="RR">RR - Roraima</option>
+                      <option value="SC">SC - Santa Catarina</option>
+                      <option value="SP" selected>SP - Sao Paulo</option>
+                      <option value="SE">SE - Sergipe</option>
+                      <option value="TO">TO - Tocantins</option>
+                    </select>
+                  </label>
+                  <label>
+                    Cidade
+                    <input id="reportCity" required value="Sao Paulo" />
+                  </label>
+                  <label>
+                    Idade
+                    <input id="reportAge" type="number" min="1" max="120" value="58" />
+                  </label>
+                  <label>
+                    Sexo
+                    <select id="reportSex">
+                      <option value="nao informado">Nao informado</option>
+                      <option value="feminino">Feminino</option>
+                      <option value="masculino">Masculino</option>
+                      <option value="outro">Outro</option>
+                    </select>
+                  </label>
+                  <label>
+                    Escolaridade
+                    <select id="reportEducation">
+                      <option value="nao informado">Nao informado</option>
+                      <option value="fundamental incompleto">Fundamental incompleto</option>
+                      <option value="fundamental completo">Fundamental completo</option>
+                      <option value="medio incompleto">Medio incompleto</option>
+                      <option value="medio completo">Medio completo</option>
+                      <option value="superior incompleto">Superior incompleto</option>
+                      <option value="superior completo">Superior completo</option>
+                      <option value="pos-graduacao">Pos-graduacao</option>
+                    </select>
+                  </label>
+                  <label>
+                    Empresa ou orgao usado no golpe
+                    <select id="reportCompany" required>
+                      <option value="Banco">Banco</option>
+                      <option value="Escritorio de advocacia">Escritorio de advocacia</option>
+                      <option value="INSS">INSS</option>
+                      <option value="Detran">Detran</option>
+                      <option value="Receita Federal">Receita Federal</option>
+                      <option value="Correios">Correios</option>
+                      <option value="Loja ou marketplace">Loja ou marketplace</option>
+                      <option value="Operadora de telefonia">Operadora de telefonia</option>
+                      <option value="Seguradora">Seguradora</option>
+                      <option value="Concessionaria de servico publico">Concessionaria de servico publico</option>
+                      <option value="Empresa de leilao">Empresa de leilao</option>
+                      <option value="Outra empresa">Outra empresa</option>
+                    </select>
+                  </label>
+                  <label>
+                    Tipo de golpe
+                    <select id="reportScamType" required>
+                      <option value="Falso banco">Falso banco</option>
+                      <option value="Falsa central de atendimento">Falsa central de atendimento</option>
+                      <option value="Falso Pix">Falso Pix</option>
+                      <option value="Falso advogado">Falso advogado</option>
+                      <option value="Golpe do amor">Golpe do amor</option>
+                      <option value="Extorsao sexual">Extorsao sexual</option>
+                      <option value="Falso INSS">Falso INSS</option>
+                      <option value="Falso Detran">Falso Detran</option>
+                      <option value="Falso frete">Falso frete</option>
+                      <option value="Falsa loja">Falsa loja</option>
+                      <option value="Marketplace">Marketplace</option>
+                      <option value="Falso leilao">Falso leilao</option>
+                      <option value="Emprestimo fraudulento">Emprestimo fraudulento</option>
+                      <option value="Falso boleto">Falso boleto</option>
+                      <option value="Phishing">Phishing</option>
+                      <option value="Fraude do CEO">Fraude do CEO</option>
+                      <option value="Outro golpe">Outro golpe</option>
+                    </select>
+                  </label>
+                  <label>
+                    Tipo de identificador
+                    <select id="reportIndicatorType" required>
+                      <option value="telefone">Telefone</option>
+                      <option value="chave pix">Chave Pix</option>
+                      <option value="e-mail">E-mail</option>
+                      <option value="site">Site</option>
+                      <option value="conta corrente">Conta corrente</option>
+                      <option value="cpf">CPF</option>
+                      <option value="cnpj">CNPJ</option>
+                      <option value="qr code">QR Code</option>
+                      <option value="perfil em rede social">Perfil em rede social</option>
+                      <option value="boleto">Boleto</option>
+                      <option value="outro">Outro</option>
+                    </select>
+                  </label>
+                  <label>
+                    Identificador suspeito
+                    <input id="reportIndicator" required value="+55 11 94002-7788" />
+                  </label>
+                  <label>
+                    Prejuizo estimado
+                    <input id="reportLoss" type="number" min="0" step="50" value="0" />
+                  </label>
+                </div>
                 <label>
                   Mensagem recebida
                   <textarea id="reportText" required rows="6">Banco X informa: sua conta sera bloqueada. Regularize o Pix no link seguro.</textarea>
-                </label>
-                <label>
-                  Prejuizo estimado
-                  <input id="reportLoss" type="number" min="0" step="50" value="0" />
                 </label>
                 <button class="primary-button" type="submit">Enviar denuncia</button>
               </form>
             </section>
             <section class="panel result-panel">
-              <span class="eyebrow">Classificacao automatica</span>
+              <span class="eyebrow">Classificacao e risco</span>
               <div id="classificationResult" class="classification-box"></div>
             </section>
           </div>
