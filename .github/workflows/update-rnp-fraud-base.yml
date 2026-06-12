@@ -21,7 +21,7 @@ jobs:
           python-version: "3.12"
 
       - name: Build compact RNP fraud base
-        run: python tools/build_rnp_fraud_base.py --limit 500 --max-pages 80 --delay 0.25 --insecure-tls
+        run: python tools/build_rnp_fraud_base.py --limit 2000 --max-pages 300 --delay 0.25 --progress-every 100 --insecure-tls
 
       - name: Validate JSON
         run: python -m json.tool data/fraudes-rnp.json > /tmp/fraudes-rnp.pretty.json

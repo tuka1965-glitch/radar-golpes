@@ -221,7 +221,8 @@ def build(args):
         item = parse_detail(fraud_id, detail_html)
         if item["title"] or item["messageText"]:
             items.append(item)
-        print(f"{position}/{len(ids)} {fraud_id} {item['title']}")
+        if args.progress_every and (position == 1 or position % args.progress_every == 0 or position == len(ids)):
+            print(f"{position}/{len(ids)} {fraud_id} {item['title']}")
 
     output = {
         "source": "https://catalogodefraudes.rnp.br/",
@@ -237,11 +238,12 @@ def build(args):
 
 def main():
     parser = argparse.ArgumentParser(description="Build a compact RNP fraud catalog JSON for the Radar de Golpes prototype.")
-    parser.add_argument("--limit", type=int, default=500, help="Maximum number of fraud records to collect.")
-    parser.add_argument("--max-pages", type=int, default=80, help="Maximum catalog pages to scan for IDs.")
+    parser.add_argument("--limit", type=int, default=2000, help="Maximum number of fraud records to collect.")
+    parser.add_argument("--max-pages", type=int, default=300, help="Maximum catalog pages to scan for IDs.")
     parser.add_argument("--delay", type=float, default=0.2, help="Delay in seconds between HTTP requests.")
     parser.add_argument("--insecure-tls", action="store_true", help="Disable TLS certificate verification for environments with local CA issues.")
     parser.add_argument("--output", type=Path, default=Path("data/fraudes-rnp.json"))
+    parser.add_argument("--progress-every", type=int, default=25, help="Print progress every N records. Use 0 to disable progress.")
     args = parser.parse_args()
     build(args)
 
