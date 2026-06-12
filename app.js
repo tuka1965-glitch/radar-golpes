@@ -13,6 +13,8 @@ const reports = [
   { date: "2026-06-07 17:42", uf: "AM", city: "Manaus", category: "Falsa loja", indicatorType: "site", indicator: "ofertas-relampago-br.com", risk: "baixo", loss: 180, company: "Loja ou marketplace", profile: "universitario", channel: "Site", growth: 22 }
 ];
 
+let knownFrauds = [];
+
 const cityPositions = {
   "Manaus": [22, 30],
   "Fortaleza": [74, 29],
@@ -30,6 +32,21 @@ const cityPositions = {
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 
 const $ = (selector) => document.querySelector(selector);
+
+function normalizeSearchText(value) {
+  return (value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9@./:+-]+/g, " ");
+}
+
+function searchTokens(value) {
+  const stopwords = new Set(["para", "com", "uma", "por", "que", "dos", "das", "este", "esta", "como", "mais", "mensagem", "fraude"]);
+  return normalizeSearchText(value)
+    .split(/\s+/)
+    .filter((token) => token.length >= 4 && !stopwords.has(token));
+}
 
 function filteredReports() {
   return reports;
@@ -113,6 +130,53 @@ function renderRows(data) {
   `).join("");
 }
 
+async function loadKnownFrauds() {
+  try {
+    const response = await fetch("data/fraudes-rnp.json", { cache: "no-store" });
+    if (!response.ok) {
+      return;
+    }
+    const catalog = await response.json();
+    knownFrauds = Array.isArray(catalog.items) ? catalog.items : [];
+    renderLookup();
+  } catch (error) {
+    knownFrauds = [];
+  }
+}
+
+function matchKnownFrauds(value) {
+  if (!knownFrauds.length) {
+    return [];
+  }
+  const normalized = normalizeSearchText(value);
+  const tokens = new Set(searchTokens(value));
+
+  return knownFrauds
+    .map((fraud) => {
+      const indicators = fraud.indicators || {};
+      const indicatorValues = [
+        ...(indicators.urls || []),
+        ...(indicators.emails || []),
+        ...(indicators.phones || []),
+        ...(indicators.domains || []),
+      ];
+      const indicatorHit = indicatorValues.some((indicator) => indicator && normalized.includes(normalizeSearchText(indicator).trim()));
+      const keywordHits = (fraud.keywords || []).filter((keyword) => tokens.has(normalizeSearchText(keyword).trim()));
+      const sourceText = normalizeSearchText(`${fraud.title || ""} ${fraud.subject || ""} ${fraud.description || ""} ${fraud.excerpt || ""}`);
+      const tokenHits = [...tokens].filter((token) => sourceText.includes(token)).slice(0, 12);
+      const score = (indicatorHit ? 8 : 0) + keywordHits.length * 2 + tokenHits.length;
+      return {
+        fraud,
+        score,
+        indicatorHit,
+        hits: [...new Set([...keywordHits, ...tokenHits])].slice(0, 8),
+      };
+    })
+    .filter((match) => match.score >= 4)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4);
+}
+
 function render() {
   const data = filteredReports();
   renderMetrics(data);
@@ -124,6 +188,7 @@ function render() {
 
 function riskLookup(value) {
   const normalized = value.toLowerCase();
+  const knownMatches = matchKnownFrauds(value);
   const matches = reports.filter((report) => {
     const corpus = `${report.indicator} ${report.indicatorType || ""} ${report.category} ${report.company} ${report.channel}`.toLowerCase();
     return normalized.includes(report.indicator.toLowerCase()) || corpus.split(/[\s.-]+/).some((token) => token.length > 4 && normalized.includes(token));
@@ -138,7 +203,7 @@ function riskLookup(value) {
     ["advogado", "Possivel falso profissional"]
   ].filter(([keyword]) => normalized.includes(keyword));
 
-  const baseScore = matches.length ? 58 + matches.length * 10 : 24;
+  const baseScore = matches.length || knownMatches.length ? 58 + matches.length * 10 + knownMatches.length * 6 : 24;
   const score = Math.min(96, baseScore + keywordHits.length * 8);
   const label = score >= 75 ? "Alto risco" : score >= 45 ? "Risco medio" : "Risco baixo";
 
@@ -146,6 +211,7 @@ function riskLookup(value) {
     score,
     label,
     matches,
+    knownMatches,
     keywordHits
   };
 }
@@ -154,13 +220,14 @@ function renderLookup() {
   const result = riskLookup($("#lookupInput").value);
   const findings = [
     ...result.matches.slice(0, 3).map((match) => `<div class="finding"><strong>${match.indicator}</strong><p>Ja apareceu em ${match.city} como ${match.category.toLowerCase()}.</p></div>`),
+    ...result.knownMatches.map(({ fraud, hits }) => `<div class="finding"><strong>${fraud.scamType || fraud.title}</strong><p>Similar ao catalogo RNP: ${fraud.subject || fraud.title}. ${hits.length ? `Sinais: ${hits.join(", ")}.` : ""} <a href="${fraud.sourceUrl}" target="_blank" rel="noopener">Fonte</a></p></div>`),
     ...result.keywordHits.map((hit) => `<div class="finding"><strong>${hit[0]}</strong><p>${hit[1]}.</p></div>`)
   ];
 
   $("#lookupResult").innerHTML = `
     <div class="score-ring" style="--score:${result.score}%"><strong>${result.score}</strong></div>
     <h2>${result.label}</h2>
-    <p>${result.matches.length ? `Encontramos ${result.matches.length} ocorrencia(s) relacionadas na base.` : "Nao ha denuncia igual, mas os sinais do texto ainda foram analisados."}</p>
+    <p>${result.matches.length || result.knownMatches.length ? `Encontramos ${result.matches.length + result.knownMatches.length} ocorrencia(s) relacionadas nas bases.` : "Nao ha denuncia igual, mas os sinais do texto ainda foram analisados."}</p>
     ${findings.join("") || `<div class="finding"><strong>Sem reincidencia</strong><p>O identificador ainda nao aparece na base simulada.</p></div>`}
   `;
 }
@@ -240,3 +307,4 @@ function bindEvents() {
 bindEvents();
 render();
 renderLookup();
+loadKnownFrauds();
