@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Radar de Golpes</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Navegacao principal">
+        <div class="brand">
+          <span class="brand-mark">RG</span>
+          <div>
+            <strong>Radar de Golpes</strong>
+            <span>Inteligencia colaborativa</span>
+          </div>
+        </div>
+        <nav class="nav-tabs" aria-label="Modulos">
+          <button class="nav-item active" data-view="overview" type="button">Painel</button>
+          <button class="nav-item" data-view="consulta" type="button">Consulta</button>
+          <button class="nav-item" data-view="denuncia" type="button">Denuncia</button>
+          <button class="nav-item" data-view="corporativo" type="button">Empresas</button>
+        </nav>
+        <div class="sidebar-panel">
+          <span class="eyebrow">Assinatura</span>
+          <strong>Premium</strong>
+          <p>Consultas ilimitadas, alertas por perfil e historico completo.</p>
+          <span class="price">R$ 14,90/mes</span>
+        </div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div>
+            <span class="eyebrow">Centro de Inteligencia de Fraudes</span>
+            <h1>Waze dos golpes digitais no Brasil</h1>
+          </div>
+          <div class="status-strip" aria-label="Resumo operacional">
+            <span><strong id="reportsTotal">0</strong> denuncias</span>
+            <span><strong id="riskHigh">0</strong> alto risco</span>
+            <span><strong id="emergingCount">0</strong> emergentes</span>
+          </div>
+        </header>
+
+        <section class="toolbar" aria-label="Filtros globais">
+          <label>
+            Cidade
+            <select id="cityFilter">
+              <option value="todas">Todas</option>
+            </select>
+          </label>
+          <label>
+            Perfil
+            <select id="profileFilter">
+              <option value="todos">Todos</option>
+              <option value="aposentado">Aposentados</option>
+              <option value="empreendedor">Empreendedores</option>
+              <option value="universitario">Universitarios</option>
+              <option value="juridico">Juridico</option>
+            </select>
+          </label>
+          <label>
+            Banco
+            <select id="bankFilter">
+              <option value="todos">Todos</option>
+            </select>
+          </label>
+          <button id="resetFilters" class="ghost-button" type="button">Limpar</button>
+        </section>
+
+        <section class="view active" id="overview">
+          <div class="metric-grid">
+            <article class="metric">
+              <span>Denuncias em 48h</span>
+              <strong id="metric48h">0</strong>
+              <small id="metric48hDelta">Sem variacao</small>
+            </article>
+            <article class="metric">
+              <span>Prejuizo estimado</span>
+              <strong id="metricLoss">R$ 0</strong>
+              <small>Base colaborativa simulada</small>
+            </article>
+            <article class="metric">
+              <span>Chaves Pix suspeitas</span>
+              <strong id="metricPix">0</strong>
+              <small>Reincidencia por identificador</small>
+            </article>
+            <article class="metric">
+              <span>Marcas usadas</span>
+              <strong id="metricBrands">0</strong>
+              <small>Bancos, lojas e orgaos publicos</small>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel">
+              <div class="section-title">
+                <div>
+                  <span class="eyebrow">Alertas regionais</span>
+                  <h2>Golpes em aceleracao</h2>
+                </div>
+              </div>
+              <div id="alertList" class="alert-list"></div>
+            </section>
+
+            <section class="panel">
+              <div class="section-title">
+                <div>
+                  <span class="eyebrow">Mapa de fraudes</span>
+                  <h2>Concentracao por cidade</h2>
+                </div>
+              </div>
+              <div class="map-stage" aria-label="Mapa simplificado de concentracao de golpes">
+                <div class="map-grid" id="mapGrid"></div>
+              </div>
+            </section>
+
+            <section class="panel wide">
+              <div class="section-title">
+                <div>
+                  <span class="eyebrow">Modus operandi</span>
+                  <h2>Tipos mais reportados</h2>
+                </div>
+              </div>
+              <div id="categoryBars" class="bars"></div>
+            </section>
+
+            <section class="panel wide">
+              <div class="section-title">
+                <div>
+                  <span class="eyebrow">Feed operacional</span>
+                  <h2>Denuncias recentes</h2>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Cidade</th>
+                      <th>Tipo</th>
+                      <th>Identificador</th>
+                      <th>Risco</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reportRows"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="consulta">
+          <div class="workflow">
+            <section class="panel">
+              <div class="section-title">
+                <div>
+                  <span class="eyebrow">Consulta preventiva</span>
+                  <h2>Verifique antes de clicar ou pagar</h2>
+                </div>
+              </div>
+              <label class="input-block">
+                Telefone, chave Pix, URL, CPF/CNPJ ou texto suspeito
+                <textarea id="lookupInput" rows="6">https://seguranca-banco-validar.com/pix</textarea>
+              </label>
+              <button id="lookupButton" class="primary-button" type="button">Consultar risco</button>
+            </section>
+            <section class="panel result-panel">
+              <span class="eyebrow">Resultado</span>
+              <div id="lookupResult" class="lookup-result"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="denuncia">
+          <div class="workflow">
+            <section class="panel">
+              <div class="section-title">
+                <div>
+                  <span class="eyebrow">Nova denuncia</span>
+                  <h2>IA classifica e cruza padroes</h2>
+                </div>
+              </div>
+              <form id="reportForm" class="report-form">
+                <label>
+                  Cidade
+                  <input id="reportCity" required value="Sao Paulo" />
+                </label>
+                <label>
+                  Identificador suspeito
+                  <input id="reportIndicator" required value="+55 11 94002-7788" />
+                </label>
+                <label>
+                  Mensagem recebida
+                  <textarea id="reportText" required rows="6">Banco X informa: sua conta sera bloqueada. Regularize o Pix no link seguro.</textarea>
+                </label>
+                <label>
+                  Prejuizo estimado
+                  <input id="reportLoss" type="number" min="0" step="50" value="0" />
+                </label>
+                <button class="primary-button" type="submit">Enviar denuncia</button>
+              </form>
+            </section>
+            <section class="panel result-panel">
+              <span class="eyebrow">Classificacao automatica</span>
+              <div id="classificationResult" class="classification-box"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="corporativo">
+          <div class="dashboard-grid">
+            <section class="panel wide">
+              <div class="section-title">
+                <div>
+                  <span class="eyebrow">Versao corporativa</span>
+                  <h2>Monitoramento de marca e API de risco</h2>
+                </div>
+              </div>
+              <div class="business-grid">
+                <article>
+                  <span>Monitoramento</span>
+                  <strong>Campanhas usando a marca</strong>
+                  <p>Detecta crescimento anormal de mensagens que citam bancos, varejistas, seguradoras ou orgaos publicos.</p>
+                </article>
+                <article>
+                  <span>Relatorios</span>
+                  <strong>Inteligencia mensal</strong>
+                  <p>Tendencias por regiao, perfil vitimado, canais usados, prejuizo estimado e novos modos de operacao.</p>
+                </article>
+                <article>
+                  <span>API</span>
+                  <strong>Score antes do Pix</strong>
+                  <p>Consulta telefone, chave Pix, URL ou e-mail e retorna risco baixo, medio ou alto para antifraude.</p>
+                </article>
+              </div>
+            </section>
+            <section class="panel">
+              <span class="eyebrow">Ticket B2B</span>
+              <div class="big-number">R$ 500 a R$ 5.000</div>
+              <p>Potencial mensal por cliente em relatorios e monitoramento setorial.</p>
+            </section>
+            <section class="panel">
+              <span class="eyebrow">Ativo estrategico</span>
+              <div class="big-number">Base privada</div>
+              <p>O valor defensavel esta no historico nacional de golpes, identificadores e padroes emergentes.</p>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
