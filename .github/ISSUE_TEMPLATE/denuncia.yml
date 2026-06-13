@@ -1,0 +1,165 @@
+name: Denuncia de golpe
+description: Registre uma denuncia estruturada para alimentar o Radar de Golpes.
+title: "[Denuncia] "
+labels: ["denuncia"]
+body:
+  - type: dropdown
+    id: uf
+    attributes:
+      label: UF
+      options:
+        - AC
+        - AL
+        - AP
+        - AM
+        - BA
+        - CE
+        - DF
+        - ES
+        - GO
+        - MA
+        - MT
+        - MS
+        - MG
+        - PA
+        - PB
+        - PR
+        - PE
+        - PI
+        - RJ
+        - RN
+        - RS
+        - RO
+        - RR
+        - SC
+        - SP
+        - SE
+        - TO
+    validations:
+      required: true
+  - type: input
+    id: cidade
+    attributes:
+      label: Cidade
+      placeholder: Sao Paulo
+    validations:
+      required: true
+  - type: dropdown
+    id: tipo_golpe
+    attributes:
+      label: Tipo de golpe
+      options:
+        - Falso banco
+        - Falsa central de atendimento
+        - Falso Pix
+        - Falso advogado
+        - Golpe do amor
+        - Extorsao sexual
+        - Falso INSS
+        - Falso Detran
+        - Falso frete
+        - Falsa loja
+        - Marketplace
+        - Falso leilao
+        - Emprestimo fraudulento
+        - Falso boleto
+        - Phishing
+        - Fraude do CEO
+        - Outro golpe
+    validations:
+      required: true
+  - type: dropdown
+    id: empresa
+    attributes:
+      label: Empresa ou orgao usado no golpe
+      options:
+        - Banco
+        - Escritorio de advocacia
+        - INSS
+        - Detran
+        - Receita Federal
+        - Correios
+        - Loja ou marketplace
+        - Operadora de telefonia
+        - Seguradora
+        - Concessionaria de servico publico
+        - Empresa de leilao
+        - Outra empresa
+    validations:
+      required: true
+  - type: dropdown
+    id: tipo_identificador
+    attributes:
+      label: Tipo de identificador
+      options:
+        - telefone
+        - chave pix
+        - e-mail
+        - site
+        - conta corrente
+        - cpf
+        - cnpj
+        - qr code
+        - perfil em rede social
+        - boleto
+        - outro
+    validations:
+      required: true
+  - type: input
+    id: identificador
+    attributes:
+      label: Identificador suspeito
+      description: Evite informar dados pessoais completos se nao for necessario.
+      placeholder: dominio suspeito, telefone parcial, chave Pix parcial etc.
+    validations:
+      required: true
+  - type: input
+    id: prejuizo
+    attributes:
+      label: Prejuizo estimado
+      placeholder: 0
+  - type: dropdown
+    id: risco
+    attributes:
+      label: Risco percebido
+      options:
+        - alto
+        - medio
+        - baixo
+    validations:
+      required: true
+  - type: input
+    id: idade
+    attributes:
+      label: Idade
+      placeholder: 45
+  - type: dropdown
+    id: sexo
+    attributes:
+      label: Sexo
+      options:
+        - nao informado
+        - feminino
+        - masculino
+        - outro
+  - type: dropdown
+    id: escolaridade
+    attributes:
+      label: Escolaridade
+      options:
+        - nao informado
+        - fundamental incompleto
+        - fundamental completo
+        - medio incompleto
+        - medio completo
+        - superior incompleto
+        - superior completo
+        - pos-graduacao
+  - type: textarea
+    id: relato
+    attributes:
+      label: Mensagem recebida ou relato
+      description: Remova senhas, tokens, documentos completos e outros dados sensiveis.
+      placeholder: Descreva como o golpe aconteceu.
+    validations:
+      required: true

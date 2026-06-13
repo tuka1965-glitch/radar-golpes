@@ -718,6 +718,24 @@ th {
   font-weight: 800;
 }
 
+.github-submit {
+  border: 1px solid rgba(41, 95, 152, 0.22);
+  border-radius: 8px;
+  background: #f7fbff;
+  padding: 12px;
+  margin-bottom: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.github-submit .primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  text-decoration: none;
+}
+
 .business-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

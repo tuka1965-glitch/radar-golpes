@@ -16,6 +16,7 @@ const seedReports = [
 const STORAGE_KEY = "radar-golpes-user-reports-v1";
 const LOOKUP_STORAGE_KEY = "radar-golpes-lookups-v1";
 const SUPABASE_CONFIG_PATH = "data/supabase-config.json";
+const GITHUB_ISSUES_CONFIG_PATH = "data/github-issues-config.json";
 let userReports = [];
 let reports = [];
 let knownFrauds = [];
@@ -25,6 +26,7 @@ let modusOperandi = null;
 let supabaseConfig = null;
 let remoteReportsReady = false;
 let remoteLookupsReady = false;
+let githubIssuesConfig = null;
 
 const cityPositions = {
   "Manaus": [22, 30],
@@ -65,6 +67,102 @@ function loadUserReports() {
 
 function saveUserReports() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(userReports));
+}
+
+async function loadGithubIssuesConfig() {
+  try {
+    const response = await fetch(GITHUB_ISSUES_CONFIG_PATH, { cache: "no-store" });
+    if (!response.ok) {
+      return;
+    }
+    const config = await response.json();
+    if (config.enabled && config.repo) {
+      githubIssuesConfig = {
+        repo: config.repo,
+        label: config.label || "denuncia",
+        issueFormUrl: config.issueFormUrl || `https://github.com/${config.repo}/issues/new`
+      };
+    }
+  } catch (error) {
+    githubIssuesConfig = null;
+  }
+}
+
+function parseGithubIssueField(body, label) {
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(`###\\s*${escaped}\\s*\\n+([\\s\\S]*?)(?=\\n###\\s|$)`, "i");
+  const match = String(body || "").match(pattern);
+  return match ? match[1].replace(/<!--([\\s\\S]*?)-->/g, "").trim() : "";
+}
+
+function githubIssueToReport(issue) {
+  const body = issue.body || "";
+  const createdAt = issue.created_at ? new Date(issue.created_at) : new Date();
+  return {
+    date: createdAt.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    uf: parseGithubIssueField(body, "UF"),
+    city: parseGithubIssueField(body, "Cidade"),
+    category: parseGithubIssueField(body, "Tipo de golpe") || "Outro golpe",
+    indicatorType: parseGithubIssueField(body, "Tipo de identificador"),
+    indicator: parseGithubIssueField(body, "Identificador suspeito"),
+    risk: parseGithubIssueField(body, "Risco percebido") || "medio",
+    loss: Number(parseGithubIssueField(body, "Prejuizo estimado").replace(/[^\d.,-]/g, "").replace(",", ".") || 0),
+    company: parseGithubIssueField(body, "Empresa ou orgao usado no golpe"),
+    profile: "todos",
+    age: parseGithubIssueField(body, "Idade"),
+    sex: parseGithubIssueField(body, "Sexo"),
+    education: parseGithubIssueField(body, "Escolaridade"),
+    channel: /whatsapp|zap/i.test(body) ? "WhatsApp" : "GitHub Issue",
+    growth: 121,
+    sourceUrl: issue.html_url
+  };
+}
+
+async function fetchGithubIssueReports() {
+  if (!githubIssuesConfig) {
+    return false;
+  }
+  try {
+    const endpoint = `https://api.github.com/repos/${githubIssuesConfig.repo}/issues?state=all&per_page=100`;
+    const response = await fetch(endpoint, {
+      cache: "no-store",
+      headers: {
+        Accept: "application/vnd.github+json"
+      }
+    });
+    if (!response.ok) {
+      throw new Error("GitHub issues select failed");
+    }
+    const issues = await response.json();
+    const issueReports = Array.isArray(issues)
+      ? issues
+        .filter((issue) => {
+          const labels = (issue.labels || []).map((label) => label.name);
+          return !issue.pull_request
+            && (labels.includes(githubIssuesConfig.label) || /^\[Denuncia\]/i.test(issue.title || "") || /###\s*UF/i.test(issue.body || ""));
+        })
+        .map(githubIssueToReport)
+        .filter((report) => report.city)
+      : [];
+    if (issueReports.length) {
+      userReports = issueReports;
+      reports = [...issueReports];
+      remoteReportsReady = true;
+      render();
+    } else {
+      remoteReportsReady = false;
+    }
+    return true;
+  } catch (error) {
+    remoteReportsReady = false;
+    return false;
+  }
 }
 
 function reportToSupabaseRow(report, reportText = "") {
@@ -822,7 +920,7 @@ async function addReport(event) {
   submitButton.textContent = savedRemote ? "Denuncia enviada" : "Salva neste navegador";
   status.textContent = savedRemote
     ? `Denuncia registrada na base compartilhada para ${newReport.city}/${newReport.uf}.`
-    : `Supabase nao configurado ou indisponivel. Denuncia salva apenas neste navegador para ${newReport.city}/${newReport.uf}.`;
+    : `Denuncia salva apenas neste navegador para ${newReport.city}/${newReport.uf}. Para aparecer em outros dispositivos, use o formulario do GitHub.`;
   $("#classificationResult").innerHTML = `
     <div class="finding"><strong>${category}</strong><p>Tipo informado na denuncia. Sugestao automatica pelo texto: ${suggestedCategory}.</p></div>
     <div class="finding"><strong>${newReport.indicatorType}</strong><p>${newReport.indicator} registrado para ${newReport.company} em ${newReport.city}/${newReport.uf}.</p></div>
@@ -852,6 +950,13 @@ function bindEvents() {
   $("#reportForm").addEventListener("submit", addReport);
 }
 
+function updateGithubIssueLink() {
+  const link = $("#githubIssueLink");
+  if (link && githubIssuesConfig?.issueFormUrl) {
+    link.href = githubIssuesConfig.issueFormUrl;
+  }
+}
+
 async function init() {
   loadUserReports();
   loadLookupHistory();
@@ -862,6 +967,9 @@ async function init() {
   renderLookup();
   renderLookupStats();
   loadKnownFrauds();
+  await loadGithubIssuesConfig();
+  updateGithubIssueLink();
+  await fetchGithubIssueReports();
   await loadSupabaseConfig();
   if (supabaseConfig) {
     await fetchRemoteReports();

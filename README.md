@@ -22,13 +22,26 @@ Depois acesse `http://127.0.0.1:8765/`.
 - Categoria "Phishing web" em `data/taxonomy.json` preparada para feeds de URLs suspeitas como OpenPhish e PhishTank, sem expor links ativos na pagina publica.
 - Aba "Modus Operandi" alimentada por `data/modus-operandi.json`, com busca por palavras-chave, filtro por categoria de engenharia social e resumos baseados em exemplos publicos da Febraban.
 - Formulario de denuncia com UF, cidade aberta, idade, sexo, escolaridade, empresa, tipo de golpe, tipo de identificador e prejuizo estimado.
-- Denuncias e estatisticas de consultas podem ser salvas no Supabase para aparecerem em todos os dispositivos; sem Supabase configurado, ficam no `localStorage` do navegador.
+- Denuncias compartilhadas podem ser registradas via GitHub Issues e lidas pela pagina em todos os dispositivos; o formulario local continua como rascunho/fallback no navegador.
 - Classificacao simulada por regras para sugerir o enquadramento do texto e alimentar o painel.
 - Visao corporativa com monitoramento de marca, relatorios e API de risco.
 
-Os dados iniciais sao simulados. As novas denuncias e consultas ficam no navegador quando o Supabase esta desativado, ou em tabelas compartilhadas quando ele esta configurado.
+Os dados iniciais sao simulados. As denuncias publicadas via GitHub Issues aparecem em qualquer dispositivo quando a pagina e recarregada.
 
-## Ativar Supabase
+## Coleta via GitHub Issues
+
+O repositorio possui um Issue Form em `.github/ISSUE_TEMPLATE/denuncia.yml`. Para uma denuncia entrar na base compartilhada:
+
+1. Abra a aba "Denuncia" no site.
+2. Clique em "Registrar no GitHub".
+3. Preencha o formulario estruturado e crie a issue.
+4. Recarregue a pagina do site para ler as issues publicas do repositorio.
+
+O site le a API publica do GitHub e converte issues de denuncia em registros do painel. Isso evita expor token no navegador e dispensa backend pago.
+
+## Supabase opcional
+
+O Supabase permanece como caminho opcional. Para usar:
 
 1. Crie um projeto no Supabase.
 2. Abra o SQL Editor e rode o script `docs/supabase-schema.sql`.

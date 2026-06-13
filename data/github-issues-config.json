@@ -1,0 +1,6 @@
+{
+  "enabled": true,
+  "repo": "tuka1965-glitch/radar-golpes",
+  "label": "denuncia",
+  "issueFormUrl": "https://github.com/tuka1965-glitch/radar-golpes/issues/new?template=denuncia.yml"
+}
