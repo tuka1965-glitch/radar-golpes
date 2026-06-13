@@ -2,5 +2,6 @@
   "enabled": false,
   "url": "",
   "anonKey": "",
-  "table": "reports"
+  "table": "reports",
+  "lookupTable": "lookups"
 }

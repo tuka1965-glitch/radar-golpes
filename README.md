@@ -22,11 +22,11 @@ Depois acesse `http://127.0.0.1:8765/`.
 - Categoria "Phishing web" em `data/taxonomy.json` preparada para feeds de URLs suspeitas como OpenPhish e PhishTank, sem expor links ativos na pagina publica.
 - Aba "Modus Operandi" alimentada por `data/modus-operandi.json`, com busca por palavras-chave, filtro por categoria de engenharia social e resumos baseados em exemplos publicos da Febraban.
 - Formulario de denuncia com UF, cidade aberta, idade, sexo, escolaridade, empresa, tipo de golpe, tipo de identificador e prejuizo estimado.
-- Denuncias feitas no formulario podem ser salvas no Supabase para aparecerem em todos os dispositivos; sem Supabase configurado, ficam no `localStorage` do navegador.
+- Denuncias e estatisticas de consultas podem ser salvas no Supabase para aparecerem em todos os dispositivos; sem Supabase configurado, ficam no `localStorage` do navegador.
 - Classificacao simulada por regras para sugerir o enquadramento do texto e alimentar o painel.
 - Visao corporativa com monitoramento de marca, relatorios e API de risco.
 
-Os dados iniciais sao simulados. As novas denuncias ficam no navegador quando o Supabase esta desativado, ou na tabela compartilhada quando ele esta configurado.
+Os dados iniciais sao simulados. As novas denuncias e consultas ficam no navegador quando o Supabase esta desativado, ou em tabelas compartilhadas quando ele esta configurado.
 
 ## Ativar Supabase
 
@@ -40,11 +40,12 @@ Os dados iniciais sao simulados. As novas denuncias ficam no navegador quando o 
   "enabled": true,
   "url": "https://SEU-PROJETO.supabase.co",
   "anonKey": "SUA_ANON_PUBLIC_KEY",
-  "table": "reports"
+  "table": "reports",
+  "lookupTable": "lookups"
 }
 ```
 
-Com `enabled: true`, novas denuncias entram na tabela `reports` e a pagina passa a carregar as denuncias compartilhadas. A chave anon e publica por natureza, mas a seguranca depende das politicas RLS do script SQL.
+Com `enabled: true`, novas denuncias entram na tabela `reports` e as consultas entram na tabela `lookups`. A pagina passa a carregar as duas bases compartilhadas. As consultas sao gravadas sem o texto bruto: o site salva tipo, score, sinais, dominio quando houver URL e um hash curto do termo consultado. A chave anon e publica por natureza, mas a seguranca depende das politicas RLS do script SQL.
 
 ## Atualizar base RNP
 

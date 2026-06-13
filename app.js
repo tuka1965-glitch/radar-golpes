@@ -24,6 +24,7 @@ let taxonomy = null;
 let modusOperandi = null;
 let supabaseConfig = null;
 let remoteReportsReady = false;
+let remoteLookupsReady = false;
 
 const cityPositions = {
   "Manaus": [22, 30],
@@ -124,7 +125,8 @@ async function loadSupabaseConfig() {
       supabaseConfig = {
         url: config.url.replace(/\/$/, ""),
         anonKey: config.anonKey,
-        table: config.table || "reports"
+        table: config.table || "reports",
+        lookupTable: config.lookupTable || "lookups"
       };
     }
   } catch (error) {
@@ -177,6 +179,133 @@ async function saveRemoteReport(report, reportText) {
     });
     if (!response.ok) {
       throw new Error("Supabase insert failed");
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+function inferLookupType(value) {
+  const text = String(value || "").trim();
+  if (/^https?:\/\//i.test(text) || /\b[a-z0-9.-]+\.[a-z]{2,}\b/i.test(text)) {
+    return "site";
+  }
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) {
+    return "email";
+  }
+  if (/\b(cpf|cnpj)\b/i.test(text) || /\d{3}\.?\d{3}\.?\d{3}-?\d{2}/.test(text) || /\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}/.test(text)) {
+    return "documento";
+  }
+  if (/\+?\d[\d\s().-]{8,}/.test(text)) {
+    return "telefone";
+  }
+  if (/pix/i.test(text)) {
+    return "pix";
+  }
+  return "texto";
+}
+
+function extractLookupDomain(value) {
+  const text = String(value || "").trim();
+  try {
+    const withProtocol = /^https?:\/\//i.test(text) ? text : `https://${text}`;
+    const url = new URL(withProtocol);
+    return url.hostname.replace(/^www\./, "").slice(0, 120);
+  } catch (error) {
+    return "";
+  }
+}
+
+function hashLookupValue(value) {
+  const normalized = normalizeSearchText(value).trim();
+  let hash = 2166136261;
+  for (let index = 0; index < normalized.length; index += 1) {
+    hash ^= normalized.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(16).padStart(8, "0");
+}
+
+function lookupToSupabaseRow(summary, result, rawValue) {
+  return {
+    date_label: summary.date,
+    query_type: inferLookupType(rawValue),
+    query_hash: hashLookupValue(rawValue),
+    query_domain: inferLookupType(rawValue) === "site" ? extractLookupDomain(rawValue) : "",
+    score: summary.score,
+    label: summary.label,
+    suspicious: summary.suspicious,
+    high_risk: summary.highRisk,
+    signals: summary.signals,
+    known_match_count: result.knownMatches.length,
+    report_match_count: result.matches.length
+  };
+}
+
+function supabaseRowToLookup(row) {
+  return {
+    date: row.date_label || new Date(row.created_at).toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    score: Number(row.score || 0),
+    label: row.label || "Risco baixo",
+    suspicious: Boolean(row.suspicious),
+    highRisk: Boolean(row.high_risk),
+    signals: Array.isArray(row.signals) ? row.signals : [],
+    queryType: row.query_type || "",
+    queryDomain: row.query_domain || ""
+  };
+}
+
+async function fetchRemoteLookups() {
+  if (!supabaseConfig) {
+    return false;
+  }
+  try {
+    const endpoint = `${supabaseConfig.url}/rest/v1/${supabaseConfig.lookupTable}?select=*&order=created_at.desc&limit=500`;
+    const response = await fetch(endpoint, {
+      headers: {
+        apikey: supabaseConfig.anonKey,
+        Authorization: `Bearer ${supabaseConfig.anonKey}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error("Supabase lookup select failed");
+    }
+    const rows = await response.json();
+    lookupHistory = Array.isArray(rows) ? rows.map(supabaseRowToLookup) : [];
+    remoteLookupsReady = true;
+    renderLookupStats();
+    return true;
+  } catch (error) {
+    remoteLookupsReady = false;
+    return false;
+  }
+}
+
+async function saveRemoteLookup(summary, result, rawValue) {
+  if (!supabaseConfig) {
+    return false;
+  }
+  try {
+    const endpoint = `${supabaseConfig.url}/rest/v1/${supabaseConfig.lookupTable}`;
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        apikey: supabaseConfig.anonKey,
+        Authorization: `Bearer ${supabaseConfig.anonKey}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal"
+      },
+      body: JSON.stringify(lookupToSupabaseRow(summary, result, rawValue))
+    });
+    if (!response.ok) {
+      throw new Error("Supabase lookup insert failed");
     }
     return true;
   } catch (error) {
@@ -539,7 +668,7 @@ function renderLookup() {
   `;
 }
 
-function summarizeLookup(result) {
+function summarizeLookup(result, rawValue = "") {
   const signals = [
     ...result.matches.map((match) => match.category),
     ...result.knownMatches.map(({ fraud }) => fraud.scamType || fraud.title),
@@ -558,15 +687,28 @@ function summarizeLookup(result) {
     label: result.label,
     suspicious: result.score >= 45,
     highRisk: result.score >= 75,
-    signals: [...new Set(signals)].slice(0, 6)
+    signals: [...new Set(signals)].slice(0, 6),
+    queryType: inferLookupType(rawValue),
+    queryDomain: inferLookupType(rawValue) === "site" ? extractLookupDomain(rawValue) : ""
   };
 }
 
-function registerLookup() {
-  const result = riskLookup($("#lookupInput").value);
-  lookupHistory.unshift(summarizeLookup(result));
-  lookupHistory = lookupHistory.slice(0, 80);
-  saveLookupHistory();
+async function registerLookup() {
+  const rawValue = $("#lookupInput").value;
+  const result = riskLookup(rawValue);
+  const summary = summarizeLookup(result, rawValue);
+  const savedRemote = await saveRemoteLookup(summary, result, rawValue);
+  if (savedRemote) {
+    const refreshed = await fetchRemoteLookups();
+    if (!refreshed) {
+      lookupHistory.unshift(summary);
+      lookupHistory = lookupHistory.slice(0, 80);
+    }
+  } else {
+    lookupHistory.unshift(summary);
+    lookupHistory = lookupHistory.slice(0, 80);
+    saveLookupHistory();
+  }
   renderLookup();
   renderLookupStats();
 }
@@ -582,13 +724,21 @@ function renderLookupStats() {
     });
     return acc;
   }, {});
+  const typeCounts = lookupHistory.reduce((acc, item) => {
+    if (item.queryType) {
+      acc[item.queryType] = (acc[item.queryType] || 0) + 1;
+    }
+    return acc;
+  }, {});
   const topSignals = Object.entries(signalCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const topTypes = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const suspiciousRate = total ? Math.round((suspicious / total) * 100) : 0;
+  const historyLabel = remoteLookupsReady ? "base compartilhada" : "historico local";
 
   $("#lookupStats").innerHTML = `
     <div class="lookup-stat-grid">
       <article><span>Consultas salvas</span><strong>${total}</strong></article>
-      <article><span>Suspeitas</span><strong>${suspicious}</strong><small>${suspiciousRate}% do historico</small></article>
+      <article><span>Suspeitas</span><strong>${suspicious}</strong><small>${suspiciousRate}% da ${historyLabel}</small></article>
       <article><span>Alto risco</span><strong>${highRisk}</strong></article>
       <article><span>Com sinal conhecido</span><strong>${sourceHits}</strong></article>
     </div>
@@ -599,7 +749,11 @@ function renderLookupStats() {
       </div>
       <div>
         <strong>Ultimas consultas suspeitas</strong>
-        ${lookupHistory.filter((item) => item.suspicious).slice(0, 4).map((item) => `<p>${item.date} - ${item.label} (${item.score})</p>`).join("") || `<p>Sem consultas suspeitas no historico local.</p>`}
+        ${lookupHistory.filter((item) => item.suspicious).slice(0, 4).map((item) => `<p>${item.date} - ${item.label} (${item.score})</p>`).join("") || `<p>Sem consultas suspeitas na ${historyLabel}.</p>`}
+      </div>
+      <div>
+        <strong>Tipos consultados</strong>
+        ${topTypes.length ? topTypes.map(([type, count]) => `<p>${type}: ${count}</p>`).join("") : `<p>Tipos serao exibidos apos novas consultas.</p>`}
       </div>
     </div>
   `;
@@ -711,6 +865,7 @@ async function init() {
   await loadSupabaseConfig();
   if (supabaseConfig) {
     await fetchRemoteReports();
+    await fetchRemoteLookups();
   }
 }
 
