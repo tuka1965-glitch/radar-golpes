@@ -182,25 +182,34 @@ function renderTaxonomy() {
   }
   const categories = Array.isArray(taxonomy.categories) ? taxonomy.categories : [];
   const totalCases = categories.reduce((sum, item) => sum + Number(item.knownCases || 0), 0);
+  const totalUrls = categories.reduce((sum, item) => sum + Number(item.knownUrls || 0), 0);
   const sourceNames = (taxonomy.sources || []).map((source) => source.name).join(", ");
 
   $("#taxonomyNote").textContent = taxonomy.note || "";
   $("#taxonomySummary").innerHTML = `
     <span><strong>${categories.length}</strong> tipos</span>
     <span><strong>${totalCases.toLocaleString("pt-BR")}</strong> casos catalogados</span>
+    <span><strong>${totalUrls.toLocaleString("pt-BR")}</strong> URLs suspeitas</span>
     <span><strong>${sourceNames || "Fontes em expansao"}</strong></span>
   `;
-  $("#taxonomyList").innerHTML = categories.map((category) => `
-    <article class="taxonomy-card">
+  $("#taxonomyList").innerHTML = categories.map((category) => {
+    const metricValue = Number(category.metricValue ?? category.knownCases ?? 0);
+    const metricLabel = category.metricLabel || "casos conhecidos";
+    const share = Number(category.share || 0);
+    const shareText = category.share === null || category.share === undefined
+      ? "indicador"
+      : `${share.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`;
+    return `
+    <article class="taxonomy-card ${category.knownUrls ? "indicator-source" : ""}">
       <div class="taxonomy-card-header">
         <div>
-          <span class="eyebrow">${category.knownCases.toLocaleString("pt-BR")} casos conhecidos</span>
+          <span class="eyebrow">${metricValue.toLocaleString("pt-BR")} ${metricLabel}</span>
           <h3>${category.name}</h3>
         </div>
-        <strong>${Number(category.share || 0).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%</strong>
+        <strong>${shareText}</strong>
       </div>
       <p>${category.description}</p>
-      <div class="taxonomy-bar" aria-hidden="true"><span style="width:${category.share}%"></span></div>
+      ${category.share === null || category.share === undefined ? "" : `<div class="taxonomy-bar" aria-hidden="true"><span style="width:${share}%"></span></div>`}
       <div class="taxonomy-detail">
         <div>
           <strong>Sinais comuns</strong>
@@ -213,7 +222,8 @@ function renderTaxonomy() {
       </div>
       <p class="bias-text">${category.sourceBias}</p>
     </article>
-  `).join("");
+  `;
+  }).join("");
 }
 
 async function loadKnownFrauds() {

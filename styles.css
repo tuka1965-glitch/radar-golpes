@@ -575,6 +575,11 @@ th {
   gap: 12px;
 }
 
+.taxonomy-card.indicator-source {
+  border-color: rgba(41, 95, 152, 0.35);
+  background: #f7fbff;
+}
+
 .taxonomy-card-header,
 .taxonomy-detail {
   display: grid;

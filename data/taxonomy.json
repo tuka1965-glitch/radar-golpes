@@ -1,13 +1,20 @@
 {
-  "generatedAt": "2026-06-12",
+  "generatedAt": "2026-06-13",
   "title": "Taxonomia de tipos de golpes",
-  "note": "As frequencias indicam presenca nas bases catalogadas, nao prevalencia real nacional. A base RNP/CAIS e especializada em phishing e tende a super-representar fraudes por e-mail, faturas, boletos e paginas falsas.",
+  "note": "As frequencias indicam presenca nas bases catalogadas, nao prevalencia real nacional. A base RNP/CAIS e especializada em phishing e tende a super-representar fraudes por e-mail, faturas, boletos e paginas falsas. Feeds como OpenPhish e PhishTank devem ser tratados como indicadores de phishing web, medidos por URLs suspeitas, e nao como denuncias ou casos narrativos.",
   "sources": [
     {
       "name": "RNP/CAIS - Catalogo de Fraudes",
       "url": "https://catalogodefraudes.rnp.br/",
       "knownCases": 2000,
       "bias": "Fonte especializada em phishing e mensagens fraudulentas reportadas ou coletadas; nao representa todo o universo de golpes no Brasil."
+    },
+    {
+      "name": "OpenPhish Community Feed",
+      "url": "https://openphish.com/feed.txt",
+      "knownUrls": 300,
+      "lastChecked": "2026-06-13",
+      "bias": "Feed publico limitado de URLs de phishing; bom para deteccao de indicadores web recentes, mas nao deve ser usado como proxy de prevalencia de golpes."
     }
   ],
   "categories": [
@@ -80,6 +87,20 @@
       "sourceBias": "Categoria residual; deve diminuir com uma taxonomia mais rica.",
       "signals": ["mensagem generica", "link suspeito", "remetente estranho"],
       "examples": ["Comunicados genericos", "Alerta falso de administrador"]
+    },
+    {
+      "id": "phishing_web",
+      "name": "Phishing web",
+      "description": "Sites, paginas de login e URLs falsas usadas para capturar credenciais, simular marcas conhecidas, distribuir iscas ou conduzir a pagamentos e carteiras falsas.",
+      "knownCases": 0,
+      "knownUrls": 300,
+      "metricValue": 300,
+      "metricLabel": "URLs suspeitas",
+      "share": null,
+      "sourceBias": "Categoria alimentada por feeds de URLs como OpenPhish e, futuramente, PhishTank. O volume representa indicadores web ativos ou recentes, nao denuncias individuais nem prevalencia nacional.",
+      "signals": ["dominio parecido com marca real", "pagina de login falsa", "hospedagem gratuita", "clone de banco ou rede social", "encurtador ou redirecionamento", "wallet ou cripto falsa"],
+      "examples": ["Login falso de rede social", "Clone de banco", "Pagina falsa de carteira cripto", "Loja ou assinatura clonada"],
+      "sources": ["OpenPhish Community Feed"]
     },
     {
       "id": "encomenda_frete",
