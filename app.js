@@ -15,12 +15,15 @@ const seedReports = [
 
 const STORAGE_KEY = "radar-golpes-user-reports-v1";
 const LOOKUP_STORAGE_KEY = "radar-golpes-lookups-v1";
+const SUPABASE_CONFIG_PATH = "data/supabase-config.json";
 let userReports = [];
 let reports = [];
 let knownFrauds = [];
 let lookupHistory = [];
 let taxonomy = null;
 let modusOperandi = null;
+let supabaseConfig = null;
+let remoteReportsReady = false;
 
 const cityPositions = {
   "Manaus": [22, 30],
@@ -61,6 +64,124 @@ function loadUserReports() {
 
 function saveUserReports() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(userReports));
+}
+
+function reportToSupabaseRow(report, reportText = "") {
+  return {
+    date_label: report.date,
+    uf: report.uf,
+    city: report.city,
+    category: report.category,
+    indicator_type: report.indicatorType,
+    indicator: report.indicator,
+    risk: report.risk,
+    loss: report.loss,
+    company: report.company,
+    profile: report.profile,
+    age: report.age,
+    sex: report.sex,
+    education: report.education,
+    channel: report.channel,
+    growth: report.growth,
+    report_text: reportText
+  };
+}
+
+function supabaseRowToReport(row) {
+  return {
+    date: row.date_label || new Date(row.created_at).toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    uf: row.uf || "",
+    city: row.city || "",
+    category: row.category || "Outro golpe",
+    indicatorType: row.indicator_type || "",
+    indicator: row.indicator || "",
+    risk: row.risk || "medio",
+    loss: Number(row.loss || 0),
+    company: row.company || "",
+    profile: row.profile || "todos",
+    age: row.age || "",
+    sex: row.sex || "",
+    education: row.education || "",
+    channel: row.channel || "Texto",
+    growth: Number(row.growth || 121)
+  };
+}
+
+async function loadSupabaseConfig() {
+  try {
+    const response = await fetch(SUPABASE_CONFIG_PATH, { cache: "no-store" });
+    if (!response.ok) {
+      return;
+    }
+    const config = await response.json();
+    if (config.enabled && config.url && config.anonKey) {
+      supabaseConfig = {
+        url: config.url.replace(/\/$/, ""),
+        anonKey: config.anonKey,
+        table: config.table || "reports"
+      };
+    }
+  } catch (error) {
+    supabaseConfig = null;
+  }
+}
+
+async function fetchRemoteReports() {
+  if (!supabaseConfig) {
+    return false;
+  }
+  try {
+    const endpoint = `${supabaseConfig.url}/rest/v1/${supabaseConfig.table}?select=*&order=created_at.desc&limit=500`;
+    const response = await fetch(endpoint, {
+      headers: {
+        apikey: supabaseConfig.anonKey,
+        Authorization: `Bearer ${supabaseConfig.anonKey}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error("Supabase select failed");
+    }
+    const rows = await response.json();
+    userReports = Array.isArray(rows) ? rows.map(supabaseRowToReport) : [];
+    reports = [...userReports];
+    remoteReportsReady = true;
+    render();
+    return true;
+  } catch (error) {
+    remoteReportsReady = false;
+    return false;
+  }
+}
+
+async function saveRemoteReport(report, reportText) {
+  if (!supabaseConfig) {
+    return false;
+  }
+  try {
+    const endpoint = `${supabaseConfig.url}/rest/v1/${supabaseConfig.table}`;
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        apikey: supabaseConfig.anonKey,
+        Authorization: `Bearer ${supabaseConfig.anonKey}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal"
+      },
+      body: JSON.stringify(reportToSupabaseRow(report, reportText))
+    });
+    if (!response.ok) {
+      throw new Error("Supabase insert failed");
+    }
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 function loadLookupHistory() {
@@ -498,7 +619,7 @@ function classifyReport(text) {
   return match ? match[1] : "Golpe emergente";
 }
 
-function addReport(event) {
+async function addReport(event) {
   event.preventDefault();
   const submitButton = $("#reportSubmit");
   const status = $("#reportStatus");
@@ -532,20 +653,30 @@ function addReport(event) {
     channel: /whatsapp/i.test(text) ? "WhatsApp" : "Texto",
     growth: 121
   };
-  userReports.unshift(newReport);
-  saveUserReports();
-  reports = [...userReports, ...seedReports];
+  submitButton.disabled = true;
+  submitButton.textContent = "Enviando...";
+  const savedRemote = await saveRemoteReport(newReport, text);
+  if (savedRemote) {
+    await fetchRemoteReports();
+  } else {
+    userReports.unshift(newReport);
+    saveUserReports();
+    reports = [...userReports, ...seedReports];
+  }
   render();
   submitButton.classList.add("is-success");
-  submitButton.textContent = "Denuncia enviada";
-  status.textContent = `Denuncia registrada com sucesso para ${newReport.city}/${newReport.uf}.`;
+  submitButton.textContent = savedRemote ? "Denuncia enviada" : "Salva neste navegador";
+  status.textContent = savedRemote
+    ? `Denuncia registrada na base compartilhada para ${newReport.city}/${newReport.uf}.`
+    : `Supabase nao configurado ou indisponivel. Denuncia salva apenas neste navegador para ${newReport.city}/${newReport.uf}.`;
   $("#classificationResult").innerHTML = `
     <div class="finding"><strong>${category}</strong><p>Tipo informado na denuncia. Sugestao automatica pelo texto: ${suggestedCategory}.</p></div>
     <div class="finding"><strong>${newReport.indicatorType}</strong><p>${newReport.indicator} registrado para ${newReport.company} em ${newReport.city}/${newReport.uf}.</p></div>
-    <div class="finding"><strong>${newReport.risk.toUpperCase()}</strong><p>O caso foi adicionado ao painel e passa a influenciar alertas, mapa e consulta preventiva.</p></div>
+    <div class="finding"><strong>${newReport.risk.toUpperCase()}</strong><p>O caso foi adicionado ao painel e passa a influenciar alertas, mapa e consulta preventiva${savedRemote ? " em todos os dispositivos" : " neste navegador"}.</p></div>
   `;
   window.setTimeout(() => {
     submitButton.classList.remove("is-success");
+    submitButton.disabled = false;
     submitButton.textContent = "Enviar denuncia";
   }, 2600);
   $("#reportForm").reset();
@@ -567,12 +698,20 @@ function bindEvents() {
   $("#reportForm").addEventListener("submit", addReport);
 }
 
-loadUserReports();
-loadLookupHistory();
-bindEvents();
-render();
-loadTaxonomy();
-loadModusOperandi();
-renderLookup();
-renderLookupStats();
-loadKnownFrauds();
+async function init() {
+  loadUserReports();
+  loadLookupHistory();
+  bindEvents();
+  render();
+  loadTaxonomy();
+  loadModusOperandi();
+  renderLookup();
+  renderLookupStats();
+  loadKnownFrauds();
+  await loadSupabaseConfig();
+  if (supabaseConfig) {
+    await fetchRemoteReports();
+  }
+}
+
+init();
