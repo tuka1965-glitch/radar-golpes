@@ -447,6 +447,10 @@ th {
   align-items: start;
 }
 
+.workflow > .wide {
+  grid-column: 1 / -1;
+}
+
 .input-block {
   margin-bottom: 14px;
 }
@@ -479,6 +483,54 @@ th {
   border-radius: 8px;
   padding: 12px;
   background: #fbfdfc;
+}
+
+.lookup-stats {
+  display: grid;
+  gap: 12px;
+}
+
+.lookup-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.lookup-stat-grid article {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfc;
+  padding: 12px;
+  display: grid;
+  gap: 4px;
+}
+
+.lookup-stat-grid span,
+.lookup-stat-grid small {
+  color: var(--muted);
+}
+
+.lookup-stat-grid strong {
+  font-size: 26px;
+}
+
+.lookup-stat-detail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.lookup-stat-detail > div {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfdfc;
+  padding: 12px;
+  display: grid;
+  gap: 7px;
+}
+
+.lookup-stat-detail strong {
+  display: block;
 }
 
 .note-text {
@@ -640,7 +692,9 @@ th {
 
   .metric-grid,
   .dashboard-grid,
-  .business-grid {
+  .business-grid,
+  .lookup-stat-grid,
+  .lookup-stat-detail {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -662,7 +716,9 @@ th {
   .nav-tabs,
   .metric-grid,
   .dashboard-grid,
-  .business-grid {
+  .business-grid,
+  .lookup-stat-grid,
+  .lookup-stat-detail {
     grid-template-columns: 1fr;
   }
 

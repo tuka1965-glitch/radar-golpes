@@ -14,9 +14,11 @@ const seedReports = [
 ];
 
 const STORAGE_KEY = "radar-golpes-user-reports-v1";
+const LOOKUP_STORAGE_KEY = "radar-golpes-lookups-v1";
 let userReports = [];
 let reports = [];
 let knownFrauds = [];
+let lookupHistory = [];
 let taxonomy = null;
 
 const cityPositions = {
@@ -49,6 +51,19 @@ function loadUserReports() {
 
 function saveUserReports() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(userReports));
+}
+
+function loadLookupHistory() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(LOOKUP_STORAGE_KEY) || "[]");
+    lookupHistory = Array.isArray(stored) ? stored : [];
+  } catch (error) {
+    lookupHistory = [];
+  }
+}
+
+function saveLookupHistory() {
+  localStorage.setItem(LOOKUP_STORAGE_KEY, JSON.stringify(lookupHistory.slice(0, 80)));
 }
 
 function normalizeSearchText(value) {
@@ -258,7 +273,7 @@ function render() {
 }
 
 function riskLookup(value) {
-  const normalized = value.toLowerCase();
+  const normalized = (value || "").toLowerCase();
   const knownMatches = matchKnownFrauds(value);
   const matches = reports.filter((report) => {
     const corpus = `${report.indicator} ${report.indicatorType || ""} ${report.category} ${report.company} ${report.channel}`.toLowerCase();
@@ -300,6 +315,72 @@ function renderLookup() {
     <h2>${result.label}</h2>
     <p>${result.matches.length || result.knownMatches.length ? `Encontramos ${result.matches.length + result.knownMatches.length} ocorrencia(s) relacionadas nas bases.` : "Nao ha denuncia igual, mas os sinais do texto ainda foram analisados."}</p>
     ${findings.join("") || `<div class="finding"><strong>Sem reincidencia</strong><p>O identificador ainda nao aparece na base simulada.</p></div>`}
+  `;
+}
+
+function summarizeLookup(result) {
+  const signals = [
+    ...result.matches.map((match) => match.category),
+    ...result.knownMatches.map(({ fraud }) => fraud.scamType || fraud.title),
+    ...result.keywordHits.map((hit) => hit[0])
+  ].filter(Boolean);
+
+  return {
+    date: new Date().toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    score: result.score,
+    label: result.label,
+    suspicious: result.score >= 45,
+    highRisk: result.score >= 75,
+    signals: [...new Set(signals)].slice(0, 6)
+  };
+}
+
+function registerLookup() {
+  const result = riskLookup($("#lookupInput").value);
+  lookupHistory.unshift(summarizeLookup(result));
+  lookupHistory = lookupHistory.slice(0, 80);
+  saveLookupHistory();
+  renderLookup();
+  renderLookupStats();
+}
+
+function renderLookupStats() {
+  const total = lookupHistory.length;
+  const suspicious = lookupHistory.filter((item) => item.suspicious).length;
+  const highRisk = lookupHistory.filter((item) => item.highRisk).length;
+  const sourceHits = lookupHistory.filter((item) => item.signals.length).length;
+  const signalCounts = lookupHistory.reduce((acc, item) => {
+    item.signals.forEach((signal) => {
+      acc[signal] = (acc[signal] || 0) + 1;
+    });
+    return acc;
+  }, {});
+  const topSignals = Object.entries(signalCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const suspiciousRate = total ? Math.round((suspicious / total) * 100) : 0;
+
+  $("#lookupStats").innerHTML = `
+    <div class="lookup-stat-grid">
+      <article><span>Consultas salvas</span><strong>${total}</strong></article>
+      <article><span>Suspeitas</span><strong>${suspicious}</strong><small>${suspiciousRate}% do historico</small></article>
+      <article><span>Alto risco</span><strong>${highRisk}</strong></article>
+      <article><span>Com sinal conhecido</span><strong>${sourceHits}</strong></article>
+    </div>
+    <div class="lookup-stat-detail">
+      <div>
+        <strong>Topicos recorrentes</strong>
+        ${topSignals.length ? topSignals.map(([signal, count]) => `<p>${signal}: ${count}</p>`).join("") : `<p>Nenhuma consulta registrada ainda.</p>`}
+      </div>
+      <div>
+        <strong>Ultimas consultas suspeitas</strong>
+        ${lookupHistory.filter((item) => item.suspicious).slice(0, 4).map((item) => `<p>${item.date} - ${item.label} (${item.score})</p>`).join("") || `<p>Sem consultas suspeitas no historico local.</p>`}
+      </div>
+    </div>
   `;
 }
 
@@ -380,13 +461,15 @@ function bindEvents() {
     });
   });
 
-  $("#lookupButton").addEventListener("click", renderLookup);
+  $("#lookupButton").addEventListener("click", registerLookup);
   $("#reportForm").addEventListener("submit", addReport);
 }
 
 loadUserReports();
+loadLookupHistory();
 bindEvents();
 render();
 loadTaxonomy();
 renderLookup();
+renderLookupStats();
 loadKnownFrauds();
