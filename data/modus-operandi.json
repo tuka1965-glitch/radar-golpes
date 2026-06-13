@@ -7,6 +7,63 @@
       "name": "Febraban - Golpes e Fraudes",
       "url": "https://portal.febraban.org.br/AntiFraude",
       "accessedAt": "2026-06-13"
+    },
+    {
+      "name": "CrowdStrike - 10 tipos de ataques de engenharia social",
+      "url": "https://www.crowdstrike.com/pt-br/cybersecurity-101/social-engineering/types-of-social-engineering-attacks/",
+      "accessedAt": "2026-06-13"
+    }
+  ],
+  "attackCategories": [
+    {
+      "id": "phishing",
+      "name": "Phishing",
+      "description": "Uso de e-mail, telefone, SMS, redes sociais ou outros canais para induzir clique, download ou entrega de dados."
+    },
+    {
+      "id": "whaling",
+      "name": "Whaling",
+      "description": "Phishing altamente personalizado contra executivos, pessoas com poder financeiro ou alvos de alto valor."
+    },
+    {
+      "id": "baiting",
+      "name": "Baiting",
+      "description": "Isca baseada em oferta tentadora, vantagem, promocao, premio, investimento ou oportunidade falsa."
+    },
+    {
+      "id": "diversion-theft",
+      "name": "Diversion theft",
+      "description": "Desvio de entrega, destino, pacote, cartao ou fluxo de pagamento por manipulacao e confusao operacional."
+    },
+    {
+      "id": "bec",
+      "name": "BEC",
+      "description": "Comprometimento ou imitacao de e-mail corporativo para induzir pagamentos, alteracoes bancarias ou ordens financeiras."
+    },
+    {
+      "id": "smishing",
+      "name": "Smishing",
+      "description": "Phishing conduzido especificamente por SMS ou mensagem curta com link, codigo ou chamada para acao."
+    },
+    {
+      "id": "quid-pro-quo",
+      "name": "Quid pro quo",
+      "description": "Oferta de ajuda, suporte ou servico desejado em troca de senha, acesso, instalacao de aplicativo ou informacao confidencial."
+    },
+    {
+      "id": "pretexto",
+      "name": "Pretexto",
+      "description": "Construcao de uma historia plausivel e urgente para convencer a vitima a revelar dados, pagar ou obedecer instrucoes."
+    },
+    {
+      "id": "honeytrap",
+      "name": "Honeytrap",
+      "description": "Uso de relacionamento afetivo, seducao ou falsa intimidade para obter dinheiro, dados ou acesso."
+    },
+    {
+      "id": "tailgating-piggybacking",
+      "name": "Tailgating/Piggybacking",
+      "description": "Acesso fisico indevido por carona, entrada junto a pessoa autorizada ou uso temporario de dispositivo alheio."
     }
   ],
   "items": [
@@ -15,126 +72,270 @@
       "title": "Golpe da falsa central de atendimento",
       "summary": "O fraudador liga se passando por funcionario do banco ou de uma empresa conhecida e diz que houve invasao, clonagem, compra suspeita ou bloqueio da conta. A partir desse susto, tenta manter a vitima na linha para obter senha, token, dados do cartao ou autorizacao para uma transacao.",
       "prevention": "Desligue a chamada e procure o canal oficial por outro telefone ou pelo aplicativo do banco. Nenhuma central legitima pede senha completa, codigo de seguranca, instalacao de aplicativo ou transferencia para proteger a conta.",
-      "keywords": ["central", "banco", "conta invadida", "senha", "cartao", "token", "ligacao"],
+      "keywords": [
+        "central",
+        "banco",
+        "conta invadida",
+        "senha",
+        "cartao",
+        "token",
+        "ligacao"
+      ],
       "sourceName": "Febraban",
-      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/2/pt-br/"
+      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/2/pt-br/",
+      "attackCategory": "Pretexto",
+      "attackCategoryId": "pretexto",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
     },
     {
       "id": "falsa-venda",
       "title": "Golpe da falsa venda",
       "summary": "O criminoso anuncia produto, servico, ingresso ou oportunidade com preco muito atrativo, normalmente em redes sociais, marketplaces ou mensagens diretas. Depois de ganhar confianca, pressiona por pagamento antecipado, Pix ou sinal, e desaparece sem entregar o que foi prometido.",
       "prevention": "Desconfie de preco muito abaixo do mercado, vendedor com pressa e pagamento fora da plataforma. Priorize meios com garantia, confira reputacao, CNPJ, historico e nunca conclua a compra por link ou conversa paralela.",
-      "keywords": ["falsa venda", "oferta", "marketplace", "pix", "loja", "produto", "promocao"],
+      "keywords": [
+        "falsa venda",
+        "oferta",
+        "marketplace",
+        "pix",
+        "loja",
+        "produto",
+        "promocao"
+      ],
       "sourceName": "Febraban",
-      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/13/pt-br/"
+      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/13/pt-br/",
+      "attackCategory": "Baiting",
+      "attackCategoryId": "baiting",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
     },
     {
       "id": "whatsapp",
       "title": "Golpe do WhatsApp",
       "summary": "O golpista tenta sequestrar a conta de WhatsApp ou se passa por alguem conhecido usando foto e nome parecidos. Em seguida, pede dinheiro com urgencia, inventando problema de saude, conta bloqueada, compra emergencial ou dificuldade momentanea.",
       "prevention": "Ative a verificacao em duas etapas e nunca informe codigos recebidos por SMS. Antes de transferir dinheiro, confirme por ligacao de voz ou video com a pessoa usando um numero ja conhecido.",
-      "keywords": ["whatsapp", "codigo", "zap", "contato", "urgencia", "emprestimo", "familia"],
+      "keywords": [
+        "whatsapp",
+        "codigo",
+        "zap",
+        "contato",
+        "urgencia",
+        "emprestimo",
+        "familia"
+      ],
       "sourceName": "Febraban",
-      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/7/pt-br/"
+      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/7/pt-br/",
+      "attackCategory": "Pretexto",
+      "attackCategoryId": "pretexto",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
     },
     {
       "id": "acesso-remoto-mao-fantasma",
       "title": "Golpe do acesso remoto ou mao fantasma",
       "summary": "A vitima recebe contato falso de suporte, banco ou central de seguranca e e convencida a instalar um aplicativo de acesso remoto. Com esse acesso, o criminoso observa ou controla o aparelho, captura credenciais e pode movimentar dinheiro enquanto simula estar ajudando.",
       "prevention": "Nao instale aplicativos indicados por desconhecidos durante atendimento telefonico ou mensagem. Bancos nao pedem acesso remoto ao celular para cancelar compras, liberar conta ou fazer varredura de seguranca.",
-      "keywords": ["acesso remoto", "mao fantasma", "aplicativo", "suporte", "anydesk", "controle", "celular"],
+      "keywords": [
+        "acesso remoto",
+        "mao fantasma",
+        "aplicativo",
+        "suporte",
+        "anydesk",
+        "controle",
+        "celular"
+      ],
       "sourceName": "Febraban",
-      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/9/pt-br/"
+      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/9/pt-br/",
+      "attackCategory": "Quid pro quo",
+      "attackCategoryId": "quid-pro-quo",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
     },
     {
       "id": "falso-motoboy",
       "title": "Golpe do falso motoboy",
       "summary": "Depois de uma ligacao falsa sobre problema no cartao, o criminoso orienta a vitima a cortar o cartao e entrega-lo a um motoboy. Mesmo cortado, o chip pode permanecer intacto, permitindo compras e saques se a senha tambem tiver sido informada.",
       "prevention": "Nunca entregue cartao a portador enviado por telefone. Se precisar descartar, destrua chip e tarja, bloqueie pelos canais oficiais e fale diretamente com o banco por telefone confiavel ou aplicativo.",
-      "keywords": ["motoboy", "cartao", "chip", "senha", "entrega", "coleta", "banco"],
+      "keywords": [
+        "motoboy",
+        "cartao",
+        "chip",
+        "senha",
+        "entrega",
+        "coleta",
+        "banco"
+      ],
       "sourceName": "Febraban",
-      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/3/pt-br/"
+      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/3/pt-br/",
+      "attackCategory": "Pretexto",
+      "attackCategoryId": "pretexto",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
     },
     {
       "id": "pix-errado",
       "title": "Golpe do Pix errado",
       "summary": "O fraudador envia um Pix para a vitima, muitas vezes usando dados obtidos previamente, e depois pede devolucao para outra chave. Em alguns casos, ele aciona mecanismos de contestacao ou usa a situacao para criar confusao e tentar receber duas vezes.",
       "prevention": "Se receber Pix desconhecido, devolva somente pela funcao oficial de devolucao do proprio banco, nunca por uma nova transferencia para chave indicada em mensagem. Guarde comprovantes e confirme tudo no app.",
-      "keywords": ["pix errado", "devolucao", "chave pix", "transferencia", "comprovante"],
+      "keywords": [
+        "pix errado",
+        "devolucao",
+        "chave pix",
+        "transferencia",
+        "comprovante"
+      ],
       "sourceName": "Febraban",
-      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/1/pt-br/"
+      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/1/pt-br/",
+      "attackCategory": "Pretexto",
+      "attackCategoryId": "pretexto",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
     },
     {
       "id": "troca-cartao",
       "title": "Golpe da troca de cartao",
       "summary": "Em compras presenciais, o criminoso distrai a vitima, observa a senha e devolve outro cartao parecido. A vitima so percebe a troca depois, quando o cartao verdadeiro ja foi usado para compras ou saques.",
       "prevention": "Confira se o cartao devolvido e realmente o seu e proteja a digitacao da senha. Evite entregar o cartao fora do seu campo de visao e prefira aproximacao quando possivel.",
-      "keywords": ["troca de cartao", "maquininha", "senha", "compra presencial", "cartao"],
+      "keywords": [
+        "troca de cartao",
+        "maquininha",
+        "senha",
+        "compra presencial",
+        "cartao"
+      ],
       "sourceName": "Febraban",
-      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/4/pt-br/"
+      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/4/pt-br/",
+      "attackCategory": "Diversion theft",
+      "attackCategoryId": "diversion-theft",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
     },
     {
       "id": "link-falso-phishing",
       "title": "Golpe do link falso ou phishing",
       "summary": "A isca chega por e-mail, SMS, rede social ou aplicativo de mensagem com aparencia de banco, loja, entrega, promocao ou orgao publico. O link leva a uma pagina falsa que coleta login, senha, dados pessoais, cartao ou autoriza um pagamento.",
       "prevention": "Nao clique em links recebidos de surpresa. Digite o endereco oficial no navegador, use o aplicativo instalado pela loja oficial e confira dominio, remetente, urgencia excessiva e erros de escrita.",
-      "keywords": ["phishing", "link falso", "site falso", "sms", "email", "login", "senha"],
+      "keywords": [
+        "phishing",
+        "link falso",
+        "site falso",
+        "sms",
+        "email",
+        "login",
+        "senha"
+      ],
       "sourceName": "Febraban",
-      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/8/pt-br/"
+      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/8/pt-br/",
+      "attackCategory": "Phishing",
+      "attackCategoryId": "phishing",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
     },
     {
       "id": "falso-investimento",
       "title": "Golpe do falso investimento",
       "summary": "O criminoso promete ganhos altos, retorno garantido ou oportunidade exclusiva, muitas vezes usando perfis falsos, influenciadores clonados ou sites que simulam corretoras. No comeco pode mostrar lucros falsos para estimular aportes maiores.",
       "prevention": "Desconfie de rentabilidade garantida, pressa para investir e promessa sem risco. Verifique se a instituicao e autorizada, pesquise reclamações e nunca envie dinheiro para conta de pessoa fisica ou empresa desconhecida.",
-      "keywords": ["investimento", "lucro", "rentabilidade", "cripto", "corretora", "ganho garantido"],
+      "keywords": [
+        "investimento",
+        "lucro",
+        "rentabilidade",
+        "cripto",
+        "corretora",
+        "ganho garantido"
+      ],
       "sourceName": "Febraban",
-      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/11/pt-br/"
+      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/11/pt-br/",
+      "attackCategory": "Baiting",
+      "attackCategoryId": "baiting",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
     },
     {
       "id": "falso-boleto",
       "title": "Golpe do falso boleto",
       "summary": "A vitima recebe boleto adulterado por e-mail, mensagem, site falso ou atendimento fraudulento. O documento pode parecer legitimo, mas o codigo de barras ou QR Code direciona o pagamento para conta controlada pelo criminoso.",
       "prevention": "Antes de pagar, confira beneficiario, banco emissor, valor, vencimento e origem do boleto. Use canais oficiais da empresa e desconfie de segunda via enviada por link ou com desconto inesperado.",
-      "keywords": ["boleto", "segunda via", "codigo de barras", "qr code", "pagamento", "fatura"],
+      "keywords": [
+        "boleto",
+        "segunda via",
+        "codigo de barras",
+        "qr code",
+        "pagamento",
+        "fatura"
+      ],
       "sourceName": "Febraban",
-      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/14/pt-br/"
+      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/14/pt-br/",
+      "attackCategory": "Phishing",
+      "attackCategoryId": "phishing",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
     },
     {
       "id": "falso-emprestimo",
       "title": "Golpe do falso emprestimo",
       "summary": "A vitima recebe oferta de credito facil, mesmo negativada, e e convencida a pagar taxa antecipada, seguro, fianca ou desbloqueio para liberar o dinheiro. Depois do pagamento, surgem novas cobrancas ou o contato desaparece.",
       "prevention": "Instituicao seria nao cobra deposito antecipado para liberar emprestimo. Verifique canais oficiais, contrato, CNPJ e autorizacao da empresa antes de enviar documentos ou dinheiro.",
-      "keywords": ["emprestimo", "credito facil", "taxa antecipada", "negativado", "liberacao", "fianca"],
+      "keywords": [
+        "emprestimo",
+        "credito facil",
+        "taxa antecipada",
+        "negativado",
+        "liberacao",
+        "fianca"
+      ],
       "sourceName": "Febraban",
-      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/10/pt-br/"
+      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/10/pt-br/",
+      "attackCategory": "Baiting",
+      "attackCategoryId": "baiting",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
     },
     {
       "id": "maquininha-quebrada",
       "title": "Golpe da maquininha quebrada",
       "summary": "O entregador ou vendedor afirma que a maquininha esta com visor quebrado, sem sinal ou com problema, dificultando a conferencia do valor. A vitima digita a senha sem perceber cobranca maior, repetida ou feita em equipamento adulterado.",
       "prevention": "Nao pague se nao conseguir ver o valor na tela. Confira o comprovante, acompanhe notificacoes do banco e cancele a compra se houver pressa ou justificativa estranha para trocar de maquina.",
-      "keywords": ["maquininha", "visor quebrado", "entrega", "cartao", "valor", "senha"],
+      "keywords": [
+        "maquininha",
+        "visor quebrado",
+        "entrega",
+        "cartao",
+        "valor",
+        "senha"
+      ],
       "sourceName": "Febraban",
-      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/5/pt-br/"
+      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/5/pt-br/",
+      "attackCategory": "Pretexto",
+      "attackCategoryId": "pretexto",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
     },
     {
       "id": "falso-leilao",
       "title": "Golpe do falso leilao",
       "summary": "Criminosos criam sites, anuncios e perfis que imitam leiloeiros, seguradoras, bancos ou orgaos publicos. Usam fotos reais de veiculos e bens, preco atrativo e urgencia para receber sinal ou pagamento integral em conta indicada.",
       "prevention": "Confira se o leiloeiro e registrado, valide edital, dominio, CNPJ, telefone e endereco por fontes independentes. Nao pague para conta de terceiros e desconfie de pressa para fechar lance fora do site oficial.",
-      "keywords": ["leilao", "veiculo", "edital", "lance", "sinal", "site falso"],
+      "keywords": [
+        "leilao",
+        "veiculo",
+        "edital",
+        "lance",
+        "sinal",
+        "site falso"
+      ],
       "sourceName": "Febraban",
-      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/6/pt-br/"
+      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/6/pt-br/",
+      "attackCategory": "Baiting",
+      "attackCategoryId": "baiting",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
     },
     {
       "id": "restituicao-imposto-renda",
       "title": "Golpe da restituicao do imposto de renda",
       "summary": "A fraude usa comunicados falsos sobre restituicao, malha fina, pendencia fiscal ou lote liberado para atrair a vitima a um link. A pagina falsa coleta dados pessoais, conta bancaria, senha ou cobra taxa para liberar um valor inexistente.",
       "prevention": "Consulte situacoes fiscais somente nos canais oficiais da Receita Federal e do gov.br. Nao pague taxa para receber restituicao e nao informe senha ou dados bancarios por link recebido em mensagem.",
-      "keywords": ["imposto de renda", "restituicao", "receita federal", "malha fina", "gov", "taxa"],
+      "keywords": [
+        "imposto de renda",
+        "restituicao",
+        "receita federal",
+        "malha fina",
+        "gov",
+        "taxa"
+      ],
       "sourceName": "Febraban",
-      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/12/pt-br/"
+      "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/12/pt-br/",
+      "attackCategory": "Phishing",
+      "attackCategoryId": "phishing",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
     }
   ]
 }

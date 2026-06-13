@@ -20,7 +20,7 @@ Depois acesse `http://127.0.0.1:8765/`.
 - Base inicial de 2.000 fraudes conhecidas da RNP/CAIS em `data/fraudes-rnp.json`, gerada por `tools/build_rnp_fraud_base.py`.
 - Aba "Tipos de Golpes" alimentada por `data/taxonomy.json`, separada das estatisticas de denuncias.
 - Categoria "Phishing web" em `data/taxonomy.json` preparada para feeds de URLs suspeitas como OpenPhish e PhishTank, sem expor links ativos na pagina publica.
-- Aba "Modus Operandi" alimentada por `data/modus-operandi.json`, com busca por palavras-chave e resumos baseados em exemplos publicos da Febraban.
+- Aba "Modus Operandi" alimentada por `data/modus-operandi.json`, com busca por palavras-chave, filtro por categoria de engenharia social e resumos baseados em exemplos publicos da Febraban.
 - Formulario de denuncia com UF, cidade aberta, idade, sexo, escolaridade, empresa, tipo de golpe, tipo de identificador e prejuizo estimado.
 - Denuncias feitas no formulario ficam salvas no `localStorage` do navegador para sobreviver ao F5 no prototipo estatico.
 - Classificacao simulada por regras para sugerir o enquadramento do texto e alimentar o painel.

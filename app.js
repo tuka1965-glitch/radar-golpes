@@ -243,10 +243,23 @@ async function loadModusOperandi() {
       return;
     }
     modusOperandi = await response.json();
+    renderModusCategoryOptions();
     renderModusOperandi();
   } catch (error) {
     modusOperandi = null;
   }
+}
+
+function renderModusCategoryOptions() {
+  const select = $("#modusCategoryFilter");
+  if (!select || !modusOperandi) {
+    return;
+  }
+  const categories = Array.isArray(modusOperandi.attackCategories) ? modusOperandi.attackCategories : [];
+  select.innerHTML = `
+    <option value="">Todas as categorias</option>
+    ${categories.map((category) => `<option value="${escapeHtml(category.id)}">${escapeHtml(category.name)}</option>`).join("")}
+  `;
 }
 
 function renderModusOperandi() {
@@ -255,19 +268,26 @@ function renderModusOperandi() {
   }
 
   const query = normalizeSearchText($("#modusSearch")?.value || "").trim();
+  const selectedCategory = $("#modusCategoryFilter")?.value || "";
   const items = Array.isArray(modusOperandi.items) ? modusOperandi.items : [];
   const queryTokens = query.split(/\s+/).filter(Boolean);
-  const filteredItems = queryTokens.length
-    ? items.filter((item) => {
-      const corpus = normalizeSearchText(`${item.title} ${item.summary} ${item.prevention} ${(item.keywords || []).join(" ")}`);
-      return queryTokens.every((token) => corpus.includes(token));
-    })
-    : items;
+  const categories = Array.isArray(modusOperandi.attackCategories) ? modusOperandi.attackCategories : [];
+  const filteredItems = items.filter((item) => {
+    if (selectedCategory && item.attackCategoryId !== selectedCategory) {
+      return false;
+    }
+    if (!queryTokens.length) {
+      return true;
+    }
+    const corpus = normalizeSearchText(`${item.title} ${item.attackCategory || ""} ${item.summary} ${item.prevention} ${(item.keywords || []).join(" ")}`);
+    return queryTokens.every((token) => corpus.includes(token));
+  });
   const sourceNames = (modusOperandi.sources || []).map((source) => source.name).join(", ");
 
   $("#modusNote").textContent = modusOperandi.note || "";
   $("#modusSummary").innerHTML = `
     <span><strong>${items.length}</strong> roteiros descritos</span>
+    <span><strong>${categories.length}</strong> categorias de ataque</span>
     <span><strong>${filteredItems.length}</strong> resultado(s)</span>
     <span><strong>${sourceNames || "Fontes em expansao"}</strong></span>
   `;
@@ -279,6 +299,10 @@ function renderModusOperandi() {
           <h3>${escapeHtml(item.title)}</h3>
         </div>
         <a href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener">Fonte</a>
+      </div>
+      <div class="modus-attack">
+        <strong>${escapeHtml(item.attackCategory || "Categoria nao classificada")}</strong>
+        <span>${escapeHtml((categories.find((category) => category.id === item.attackCategoryId) || {}).description || item.attackCategorySource || "Engenharia social")}</span>
       </div>
       <p>${escapeHtml(item.summary)}</p>
       <div class="modus-prevention">
@@ -539,6 +563,7 @@ function bindEvents() {
 
   $("#lookupButton").addEventListener("click", registerLookup);
   $("#modusSearch").addEventListener("input", renderModusOperandi);
+  $("#modusCategoryFilter").addEventListener("change", renderModusOperandi);
   $("#reportForm").addEventListener("submit", addReport);
 }
 

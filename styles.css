@@ -659,6 +659,24 @@ th {
   text-decoration: none;
 }
 
+.modus-attack {
+  border: 1px solid rgba(41, 95, 152, 0.22);
+  border-radius: 8px;
+  background: #f7fbff;
+  padding: 10px;
+  display: grid;
+  gap: 4px;
+}
+
+.modus-attack strong {
+  color: var(--accent-3);
+}
+
+.modus-attack span {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 .modus-prevention {
   border-left: 3px solid var(--accent);
   padding-left: 10px;
