@@ -21,6 +21,7 @@
           <button class="nav-item" data-view="consulta" type="button">Consulta</button>
           <button class="nav-item" data-view="denuncia" type="button">Denuncia</button>
           <button class="nav-item" data-view="tipos" type="button">Tipos de Golpes</button>
+          <button class="nav-item" data-view="modus" type="button">Modus Operandi</button>
           <button class="nav-item" data-view="corporativo" type="button">Empresas</button>
         </nav>
         <div class="sidebar-panel">
@@ -325,6 +326,29 @@
 
             <section class="panel wide">
               <div id="taxonomyList" class="taxonomy-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="modus">
+          <div class="dashboard-grid">
+            <section class="panel wide">
+              <div class="section-title">
+                <div>
+                  <span class="eyebrow">Base de conhecimento</span>
+                  <h2>Modus operandi dos golpes</h2>
+                </div>
+              </div>
+              <p id="modusNote" class="note-text"></p>
+              <label class="input-block">
+                Buscar por tipo, canal, palavra-chave ou sinal do golpe
+                <input id="modusSearch" type="search" placeholder="Ex.: Pix, falso boleto, WhatsApp, senha, leilao" />
+              </label>
+              <div id="modusSummary" class="taxonomy-summary"></div>
+            </section>
+
+            <section class="panel wide">
+              <div id="modusList" class="modus-list"></div>
             </section>
           </div>
         </section>

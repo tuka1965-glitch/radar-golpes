@@ -20,6 +20,7 @@ let reports = [];
 let knownFrauds = [];
 let lookupHistory = [];
 let taxonomy = null;
+let modusOperandi = null;
 
 const cityPositions = {
   "Manaus": [22, 30],
@@ -38,6 +39,15 @@ const cityPositions = {
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 
 const $ = (selector) => document.querySelector(selector);
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 function loadUserReports() {
   try {
@@ -224,6 +234,62 @@ function renderTaxonomy() {
     </article>
   `;
   }).join("");
+}
+
+async function loadModusOperandi() {
+  try {
+    const response = await fetch("data/modus-operandi.json", { cache: "no-store" });
+    if (!response.ok) {
+      return;
+    }
+    modusOperandi = await response.json();
+    renderModusOperandi();
+  } catch (error) {
+    modusOperandi = null;
+  }
+}
+
+function renderModusOperandi() {
+  if (!modusOperandi) {
+    return;
+  }
+
+  const query = normalizeSearchText($("#modusSearch")?.value || "").trim();
+  const items = Array.isArray(modusOperandi.items) ? modusOperandi.items : [];
+  const queryTokens = query.split(/\s+/).filter(Boolean);
+  const filteredItems = queryTokens.length
+    ? items.filter((item) => {
+      const corpus = normalizeSearchText(`${item.title} ${item.summary} ${item.prevention} ${(item.keywords || []).join(" ")}`);
+      return queryTokens.every((token) => corpus.includes(token));
+    })
+    : items;
+  const sourceNames = (modusOperandi.sources || []).map((source) => source.name).join(", ");
+
+  $("#modusNote").textContent = modusOperandi.note || "";
+  $("#modusSummary").innerHTML = `
+    <span><strong>${items.length}</strong> roteiros descritos</span>
+    <span><strong>${filteredItems.length}</strong> resultado(s)</span>
+    <span><strong>${sourceNames || "Fontes em expansao"}</strong></span>
+  `;
+  $("#modusList").innerHTML = filteredItems.map((item) => `
+    <article class="modus-card">
+      <div class="modus-card-header">
+        <div>
+          <span class="eyebrow">${escapeHtml(item.sourceName || "Fonte")}</span>
+          <h3>${escapeHtml(item.title)}</h3>
+        </div>
+        <a href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener">Fonte</a>
+      </div>
+      <p>${escapeHtml(item.summary)}</p>
+      <div class="modus-prevention">
+        <strong>Como evitar</strong>
+        <p>${escapeHtml(item.prevention)}</p>
+      </div>
+      <div class="modus-keywords">
+        ${(item.keywords || []).map((keyword) => `<span>${escapeHtml(keyword)}</span>`).join("")}
+      </div>
+    </article>
+  `).join("") || `<div class="finding"><strong>Nenhum resultado</strong><p>Tente buscar por outro termo, como banco, Pix, boleto, WhatsApp, senha ou leilao.</p></div>`;
 }
 
 async function loadKnownFrauds() {
@@ -472,6 +538,7 @@ function bindEvents() {
   });
 
   $("#lookupButton").addEventListener("click", registerLookup);
+  $("#modusSearch").addEventListener("input", renderModusOperandi);
   $("#reportForm").addEventListener("submit", addReport);
 }
 
@@ -480,6 +547,7 @@ loadLookupHistory();
 bindEvents();
 render();
 loadTaxonomy();
+loadModusOperandi();
 renderLookup();
 renderLookupStats();
 loadKnownFrauds();
