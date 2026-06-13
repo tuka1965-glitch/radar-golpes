@@ -12,6 +12,11 @@
       "name": "CrowdStrike - 10 tipos de ataques de engenharia social",
       "url": "https://www.crowdstrike.com/pt-br/cybersecurity-101/social-engineering/types-of-social-engineering-attacks/",
       "accessedAt": "2026-06-13"
+    },
+    {
+      "name": "Radar de Golpes - taxonomy.json",
+      "url": "data/taxonomy.json",
+      "accessedAt": "2026-06-13"
     }
   ],
   "attackCategories": [
@@ -85,7 +90,10 @@
       "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/2/pt-br/",
       "attackCategory": "Pretexto",
       "attackCategoryId": "pretexto",
-      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social",
+      "taxonomyCategoryIds": [
+        "banco_cartao_conta"
+      ]
     },
     {
       "id": "falsa-venda",
@@ -105,7 +113,10 @@
       "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/13/pt-br/",
       "attackCategory": "Baiting",
       "attackCategoryId": "baiting",
-      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social",
+      "taxonomyCategoryIds": [
+        "doacao_premio_oferta"
+      ]
     },
     {
       "id": "whatsapp",
@@ -221,7 +232,11 @@
       "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/8/pt-br/",
       "attackCategory": "Phishing",
       "attackCategoryId": "phishing",
-      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social",
+      "taxonomyCategoryIds": [
+        "outros_phishing",
+        "phishing_web"
+      ]
     },
     {
       "id": "falso-investimento",
@@ -259,7 +274,10 @@
       "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/14/pt-br/",
       "attackCategory": "Phishing",
       "attackCategoryId": "phishing",
-      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social",
+      "taxonomyCategoryIds": [
+        "cobranca_fatura_boleto"
+      ]
     },
     {
       "id": "falso-emprestimo",
@@ -335,7 +353,171 @@
       "sourceUrl": "https://portal.febraban.org.br/DetalheAntifraude/12/pt-br/",
       "attackCategory": "Phishing",
       "attackCategoryId": "phishing",
-      "attackCategorySource": "CrowdStrike - tipos de engenharia social"
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social",
+      "taxonomyCategoryIds": [
+        "fiscal_tributario"
+      ]
+    },
+    {
+      "id": "documento-anexo-download-malicioso",
+      "title": "Golpe do documento, anexo ou download malicioso",
+      "summary": "O criminoso envia mensagem com aparencia profissional oferecendo curriculo, comprovante, nota fiscal, orcamento, contrato, documento assinado ou arquivo compartilhado. A vitima e induzida a abrir anexo, baixar arquivo ou acessar link que captura credenciais, instala malware ou redireciona para uma pagina falsa.",
+      "prevention": "Confirme por outro canal se o documento era esperado antes de abrir anexos ou links. Desconfie de arquivos executaveis, pedidos urgentes, remetente estranho e paginas que exigem login para visualizar documentos simples.",
+      "attackCategory": "Phishing",
+      "attackCategoryId": "phishing",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social",
+      "taxonomyCategoryIds": [
+        "documento_anexo_download"
+      ],
+      "keywords": [
+        "documento",
+        "anexo",
+        "download",
+        "curriculo",
+        "comprovante",
+        "orcamento",
+        "nota fiscal"
+      ],
+      "sourceName": "Radar de Golpes - taxonomy.json",
+      "sourceUrl": "data/taxonomy.json"
+    },
+    {
+      "id": "email-webmail-falso",
+      "title": "Golpe da conta de e-mail ou webmail falsa",
+      "summary": "A isca informa que a caixa postal esta cheia, a senha expirou, a conta sera bloqueada ou o webmail precisa ser validado. O link leva a uma tela falsa de login que coleta usuario e senha, permitindo invasao da conta e novos golpes contra contatos da vitima.",
+      "prevention": "Acesse o e-mail digitando o endereco oficial ou pelo aplicativo ja instalado. Nao use links de mensagens de alerta e ative autenticacao multifator para reduzir o impacto de senhas vazadas.",
+      "attackCategory": "Phishing",
+      "attackCategoryId": "phishing",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social",
+      "taxonomyCategoryIds": [
+        "email_webmail"
+      ],
+      "keywords": [
+        "email",
+        "webmail",
+        "senha expirada",
+        "armazenamento",
+        "zimbra",
+        "outlook",
+        "login"
+      ],
+      "sourceName": "Radar de Golpes - taxonomy.json",
+      "sourceUrl": "data/taxonomy.json"
+    },
+    {
+      "id": "judicial-advocacia-falsa",
+      "title": "Golpe judicial ou de advocacia falsa",
+      "summary": "O fraudador usa linguagem juridica, nome de advogado, escritorio, cartorio ou tribunal para simular processo, intimacao, acordo, protesto, alvara ou indenizacao. O objetivo e cobrar taxa, custas, honorarios falsos ou obter dados sensiveis sob pressao de prazo.",
+      "prevention": "Confirme o processo em canais oficiais do tribunal, cartorio ou escritorio conhecido. Nao pague guias ou Pix enviados por mensagem sem validar beneficiario, numero do processo e identidade do profissional.",
+      "attackCategory": "Pretexto",
+      "attackCategoryId": "pretexto",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social",
+      "taxonomyCategoryIds": [
+        "judicial_advocacia"
+      ],
+      "keywords": [
+        "advogado",
+        "processo",
+        "intimacao",
+        "cartorio",
+        "alvara",
+        "indenizacao",
+        "custas"
+      ],
+      "sourceName": "Radar de Golpes - taxonomy.json",
+      "sourceUrl": "data/taxonomy.json"
+    },
+    {
+      "id": "encomenda-frete-falso",
+      "title": "Golpe da encomenda ou frete falso",
+      "summary": "A vitima recebe SMS, e-mail ou mensagem dizendo que uma entrega foi retida, que ha taxa alfandegaria, erro de endereco ou necessidade de reagendamento. O link leva a pagamento falso, coleta de dados ou pagina clonada de transportadora.",
+      "prevention": "Consulte o rastreamento apenas no site ou aplicativo oficial da transportadora ou loja. Desconfie de taxas pequenas com urgencia, links encurtados e pedidos de Pix para liberar entrega.",
+      "attackCategory": "Smishing",
+      "attackCategoryId": "smishing",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social",
+      "taxonomyCategoryIds": [
+        "encomenda_frete"
+      ],
+      "keywords": [
+        "encomenda",
+        "frete",
+        "correios",
+        "rastreamento",
+        "alfandega",
+        "taxa",
+        "entrega"
+      ],
+      "sourceName": "Radar de Golpes - taxonomy.json",
+      "sourceUrl": "data/taxonomy.json"
+    },
+    {
+      "id": "transito-cnh-detran-falso",
+      "title": "Golpe de transito, CNH ou Detran falso",
+      "summary": "A mensagem simula multa, CNH suspensa, licenciamento vencido, pedagio pendente ou notificacao de orgao de transito. O link direciona para site falso que cobra taxa, boleto ou Pix e pode capturar documentos pessoais.",
+      "prevention": "Consulte multas, CNH e licenciamento diretamente nos canais oficiais do Detran, Senatran ou gov.br. Nao pague notificacoes recebidas por link sem conferir placa, RENAVAM, beneficiario e dominio oficial.",
+      "attackCategory": "Smishing",
+      "attackCategoryId": "smishing",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social",
+      "taxonomyCategoryIds": [
+        "transito_cnh_detran"
+      ],
+      "keywords": [
+        "detran",
+        "cnh",
+        "multa",
+        "licenciamento",
+        "pedagio",
+        "senatran",
+        "renavam"
+      ],
+      "sourceName": "Radar de Golpes - taxonomy.json",
+      "sourceUrl": "data/taxonomy.json"
+    },
+    {
+      "id": "pontos-milhas-recompensas-falsas",
+      "title": "Golpe de pontos, milhas ou recompensas falsas",
+      "summary": "O criminoso promete resgate urgente de pontos, milhas, cashback, bonus ou beneficio de fidelidade prestes a vencer. A vitima e levada a pagina falsa de login ou pagamento de taxa para liberar uma recompensa inexistente.",
+      "prevention": "Acesse programas de pontos somente pelo aplicativo ou site oficial. Desconfie de bonus excepcional, contagem regressiva, taxa de desbloqueio e pedidos de senha completa ou codigo de seguranca.",
+      "attackCategory": "Baiting",
+      "attackCategoryId": "baiting",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social",
+      "taxonomyCategoryIds": [
+        "pontos_milhas_recompensas"
+      ],
+      "keywords": [
+        "pontos",
+        "milhas",
+        "cashback",
+        "livelo",
+        "smiles",
+        "esfera",
+        "resgate"
+      ],
+      "sourceName": "Radar de Golpes - taxonomy.json",
+      "sourceUrl": "data/taxonomy.json"
+    },
+    {
+      "id": "doacao-premio-oferta-falsa",
+      "title": "Golpe de doacao, premio ou oferta falsa",
+      "summary": "A isca usa sorteio, cupom, brinde, doacao, promocao relampago ou premio para criar entusiasmo e pressa. O golpe pede cadastro, compartilhamento, taxa de envio, dados de cartao ou pagamento antecipado para liberar o suposto beneficio.",
+      "prevention": "Verifique se a campanha existe nos canais oficiais da marca ou instituicao. Nao pague taxa para receber premio, evite formul?rios recebidos por link e desconfie de ofertas que exigem compartilhamento em massa.",
+      "attackCategory": "Baiting",
+      "attackCategoryId": "baiting",
+      "attackCategorySource": "CrowdStrike - tipos de engenharia social",
+      "taxonomyCategoryIds": [
+        "doacao_premio_oferta"
+      ],
+      "keywords": [
+        "premio",
+        "cupom",
+        "doacao",
+        "sorteio",
+        "promocao",
+        "brinde",
+        "oferta"
+      ],
+      "sourceName": "Radar de Golpes - taxonomy.json",
+      "sourceUrl": "data/taxonomy.json"
     }
   ]
 }
