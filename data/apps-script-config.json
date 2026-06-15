@@ -1,6 +1,6 @@
 {
-  "enabled": false,
-  "webAppUrl": "",
+  "enabled": true,
+  "webAppUrl": "https://script.google.com/macros/s/AKfycbw_sFAZETtFI7fNbWA7Y3UXlhUky3kBy20lXjKypzhHVhRgnoxFLN20DK-5GoLHE5eg/exec",
   "reportsSheet": "denuncias",
   "lookupSheet": "consultas"
 }

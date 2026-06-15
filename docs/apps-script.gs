@@ -1,4 +1,4 @@
-const REPORT_HEADERS = [
+var REPORT_HEADERS = [
   "created_at",
   "date_label",
   "uf",
@@ -15,10 +15,10 @@ const REPORT_HEADERS = [
   "education",
   "channel",
   "growth",
-  "report_text",
+  "report_text"
 ];
 
-const LOOKUP_HEADERS = [
+var LOOKUP_HEADERS = [
   "created_at",
   "date_label",
   "query_type",
@@ -30,36 +30,46 @@ const LOOKUP_HEADERS = [
   "high_risk",
   "signals",
   "known_match_count",
-  "report_match_count",
+  "report_match_count"
 ];
 
 function doGet(e) {
-  const action = ((e && e.parameter && e.parameter.action) || "").trim();
-  const sheetName = ((e && e.parameter && e.parameter.sheet) || "").trim();
+  var action = ((e && e.parameter && e.parameter.action) || "").trim();
+  var sheetName = ((e && e.parameter && e.parameter.sheet) || "").trim();
 
   if (action === "listReports") {
-    return jsonResponse({ ok: true, items: listRows_(sheetName || "denuncias", REPORT_HEADERS) });
+    return jsonResponse({
+      ok: true,
+      items: listRows_(sheetName || "denuncias", REPORT_HEADERS)
+    });
   }
+
   if (action === "listLookups") {
-    return jsonResponse({ ok: true, items: listRows_(sheetName || "consultas", LOOKUP_HEADERS) });
+    return jsonResponse({
+      ok: true,
+      items: listRows_(sheetName || "consultas", LOOKUP_HEADERS)
+    });
   }
+
   return jsonResponse({ ok: false, error: "unsupported_action" });
 }
 
 function doPost(e) {
-  const params = (e && e.parameter) || {};
-  const action = (params.action || "").trim();
-  const sheetName = (params.sheet || "").trim();
-  const payload = parsePayload_(params.payload);
+  var params = (e && e.parameter) || {};
+  var action = (params.action || "").trim();
+  var sheetName = (params.sheet || "").trim();
+  var payload = parsePayload_(params.payload);
 
   if (action === "createReport") {
     appendRow_(sheetName || "denuncias", REPORT_HEADERS, payload);
     return jsonResponse({ ok: true });
   }
+
   if (action === "createLookup") {
     appendRow_(sheetName || "consultas", LOOKUP_HEADERS, payload);
     return jsonResponse({ ok: true });
   }
+
   return jsonResponse({ ok: false, error: "unsupported_action" });
 }
 
@@ -72,11 +82,13 @@ function parsePayload_(raw) {
 }
 
 function getSheet_(sheetName) {
-  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = spreadsheet.getSheetByName(sheetName);
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getSheetByName(sheetName);
+
   if (!sheet) {
     sheet = spreadsheet.insertSheet(sheetName);
   }
+
   return sheet;
 }
 
@@ -85,8 +97,18 @@ function ensureHeaders_(sheet, headers) {
     sheet.appendRow(headers);
     return;
   }
-  const existing = sheet.getRange(1, 1, 1, headers.length).getValues()[0];
-  const missing = headers.some((header, index) => existing[index] !== header);
+
+  var existing = sheet.getRange(1, 1, 1, headers.length).getValues()[0];
+  var missing = false;
+  var index;
+
+  for (index = 0; index < headers.length; index += 1) {
+    if (existing[index] !== headers[index]) {
+      missing = true;
+      break;
+    }
+  }
+
   if (missing) {
     sheet.clearContents();
     sheet.appendRow(headers);
@@ -94,35 +116,66 @@ function ensureHeaders_(sheet, headers) {
 }
 
 function appendRow_(sheetName, headers, payload) {
-  const sheet = getSheet_(sheetName);
+  var sheet = getSheet_(sheetName);
+  var row = [];
+  var index;
+  var header;
+  var value;
+
   ensureHeaders_(sheet, headers);
-  const row = headers.map((header) => {
+
+  for (index = 0; index < headers.length; index += 1) {
+    header = headers[index];
+
     if (header === "created_at") {
-      return new Date().toISOString();
+      row.push(new Date().toISOString());
+      continue;
     }
-    const value = payload[header];
+
+    value = payload[header];
+
     if (Array.isArray(value)) {
-      return value.join("|");
+      row.push(value.join("|"));
+    } else if (value === undefined || value === null) {
+      row.push("");
+    } else {
+      row.push(value);
     }
-    return value === undefined || value === null ? "" : value;
-  });
+  }
+
   sheet.appendRow(row);
 }
 
 function listRows_(sheetName, headers) {
-  const sheet = getSheet_(sheetName);
+  var sheet = getSheet_(sheetName);
+  var lastRow;
+  var values;
+  var items = [];
+  var rowIndex;
+  var colIndex;
+  var item;
+
   ensureHeaders_(sheet, headers);
-  const lastRow = sheet.getLastRow();
+  lastRow = sheet.getLastRow();
+
   if (lastRow <= 1) {
     return [];
   }
-  const values = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
-  return values
-    .map((row) => headers.reduce((acc, header, index) => {
-      acc[header] = row[index];
-      return acc;
-    }, {}))
-    .reverse();
+
+  values = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
+
+  for (rowIndex = 0; rowIndex < values.length; rowIndex += 1) {
+    item = {};
+
+    for (colIndex = 0; colIndex < headers.length; colIndex += 1) {
+      item[headers[colIndex]] = values[rowIndex][colIndex];
+    }
+
+    items.push(item);
+  }
+
+  items.reverse();
+  return items;
 }
 
 function jsonResponse(payload) {
