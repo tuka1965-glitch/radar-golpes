@@ -718,7 +718,7 @@ th {
   font-weight: 800;
 }
 
-.github-submit {
+.shared-submit {
   border: 1px solid rgba(41, 95, 152, 0.22);
   border-radius: 8px;
   background: #f7fbff;
@@ -728,12 +728,24 @@ th {
   gap: 8px;
 }
 
-.github-submit .primary-button {
+.shared-submit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.shared-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: fit-content;
-  text-decoration: none;
+  min-width: 72px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(24, 76, 132, 0.12);
+  color: #184c84;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .business-grid {

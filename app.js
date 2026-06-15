@@ -15,18 +15,18 @@ const seedReports = [
 
 const STORAGE_KEY = "radar-golpes-user-reports-v1";
 const LOOKUP_STORAGE_KEY = "radar-golpes-lookups-v1";
+const APPS_SCRIPT_CONFIG_PATH = "data/apps-script-config.json";
 const SUPABASE_CONFIG_PATH = "data/supabase-config.json";
-const GITHUB_ISSUES_CONFIG_PATH = "data/github-issues-config.json";
 let userReports = [];
 let reports = [];
 let knownFrauds = [];
 let lookupHistory = [];
 let taxonomy = null;
 let modusOperandi = null;
+let appsScriptConfig = null;
 let supabaseConfig = null;
 let remoteReportsReady = false;
 let remoteLookupsReady = false;
-let githubIssuesConfig = null;
 
 const cityPositions = {
   "Manaus": [22, 30],
@@ -69,98 +69,173 @@ function saveUserReports() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(userReports));
 }
 
-async function loadGithubIssuesConfig() {
+async function loadAppsScriptConfig() {
   try {
-    const response = await fetch(GITHUB_ISSUES_CONFIG_PATH, { cache: "no-store" });
+    const response = await fetch(APPS_SCRIPT_CONFIG_PATH, { cache: "no-store" });
     if (!response.ok) {
       return;
     }
     const config = await response.json();
-    if (config.enabled && config.repo) {
-      githubIssuesConfig = {
-        repo: config.repo,
-        label: config.label || "denuncia",
-        issueFormUrl: config.issueFormUrl || `https://github.com/${config.repo}/issues/new`
+    if (config.enabled && config.webAppUrl) {
+      appsScriptConfig = {
+        webAppUrl: String(config.webAppUrl).trim(),
+        reportsSheet: config.reportsSheet || "denuncias",
+        lookupSheet: config.lookupSheet || "consultas"
       };
     }
   } catch (error) {
-    githubIssuesConfig = null;
+    appsScriptConfig = null;
   }
 }
 
-function parseGithubIssueField(body, label) {
-  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const pattern = new RegExp(`###\\s*${escaped}\\s*\\n+([\\s\\S]*?)(?=\\n###\\s|$)`, "i");
-  const match = String(body || "").match(pattern);
-  return match ? match[1].replace(/<!--([\\s\\S]*?)-->/g, "").trim() : "";
+function appScriptReportToRow(report, reportText = "") {
+  return {
+    date_label: report.date,
+    uf: report.uf,
+    city: report.city,
+    category: report.category,
+    indicator_type: report.indicatorType,
+    indicator: report.indicator,
+    risk: report.risk,
+    loss: report.loss,
+    company: report.company,
+    profile: report.profile,
+    age: report.age,
+    sex: report.sex,
+    education: report.education,
+    channel: report.channel,
+    growth: report.growth,
+    report_text: reportText
+  };
 }
 
-function githubIssueToReport(issue) {
-  const body = issue.body || "";
-  const createdAt = issue.created_at ? new Date(issue.created_at) : new Date();
+function appScriptRowToReport(row) {
   return {
-    date: createdAt.toLocaleString("pt-BR", {
+    date: row.date_label || new Date(row.created_at || Date.now()).toLocaleString("pt-BR", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     }),
-    uf: parseGithubIssueField(body, "UF"),
-    city: parseGithubIssueField(body, "Cidade"),
-    category: parseGithubIssueField(body, "Tipo de golpe") || "Outro golpe",
-    indicatorType: parseGithubIssueField(body, "Tipo de identificador"),
-    indicator: parseGithubIssueField(body, "Identificador suspeito"),
-    risk: parseGithubIssueField(body, "Risco percebido") || "medio",
-    loss: Number(parseGithubIssueField(body, "Prejuizo estimado").replace(/[^\d.,-]/g, "").replace(",", ".") || 0),
-    company: parseGithubIssueField(body, "Empresa ou orgao usado no golpe"),
-    profile: "todos",
-    age: parseGithubIssueField(body, "Idade"),
-    sex: parseGithubIssueField(body, "Sexo"),
-    education: parseGithubIssueField(body, "Escolaridade"),
-    channel: /whatsapp|zap/i.test(body) ? "WhatsApp" : "GitHub Issue",
-    growth: 121,
-    sourceUrl: issue.html_url
+    uf: row.uf || "",
+    city: row.city || "",
+    category: row.category || "Outro golpe",
+    indicatorType: row.indicator_type || "",
+    indicator: row.indicator || "",
+    risk: row.risk || "medio",
+    loss: Number(row.loss || 0),
+    company: row.company || "",
+    profile: row.profile || "todos",
+    age: row.age || "",
+    sex: row.sex || "",
+    education: row.education || "",
+    channel: row.channel || "Texto",
+    growth: Number(row.growth || 121)
   };
 }
 
-async function fetchGithubIssueReports() {
-  if (!githubIssuesConfig) {
+function lookupToAppScriptRow(summary, result, rawValue) {
+  return {
+    date_label: summary.date,
+    query_type: inferLookupType(rawValue),
+    query_hash: hashLookupValue(rawValue),
+    query_domain: inferLookupType(rawValue) === "site" ? extractLookupDomain(rawValue) : "",
+    score: summary.score,
+    label: summary.label,
+    suspicious: summary.suspicious,
+    high_risk: summary.highRisk,
+    signals: summary.signals,
+    known_match_count: result.knownMatches.length,
+    report_match_count: result.matches.length
+  };
+}
+
+function appScriptRowToLookup(row) {
+  return {
+    date: row.date_label || new Date(row.created_at || Date.now()).toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    score: Number(row.score || 0),
+    label: row.label || "Risco baixo",
+    suspicious: String(row.suspicious).toLowerCase() === "true" || row.suspicious === true,
+    highRisk: String(row.high_risk).toLowerCase() === "true" || row.high_risk === true,
+    signals: Array.isArray(row.signals)
+      ? row.signals
+      : String(row.signals || "").split("|").map((item) => item.trim()).filter(Boolean),
+    queryType: row.query_type || "",
+    queryDomain: row.query_domain || ""
+  };
+}
+
+async function fetchAppsScriptRows(kind) {
+  if (!appsScriptConfig) {
+    return [];
+  }
+  const endpoint = new URL(appsScriptConfig.webAppUrl);
+  endpoint.searchParams.set("action", kind === "reports" ? "listReports" : "listLookups");
+  endpoint.searchParams.set("sheet", kind === "reports" ? appsScriptConfig.reportsSheet : appsScriptConfig.lookupSheet);
+  const response = await fetch(endpoint.toString(), { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error("Apps Script select failed");
+  }
+  const payload = await response.json();
+  return Array.isArray(payload.items) ? payload.items : [];
+}
+
+async function postAppsScriptRow(action, payload) {
+  if (!appsScriptConfig) {
+    return false;
+  }
+  const body = new URLSearchParams({
+    action,
+    sheet: action === "createReport" ? appsScriptConfig.reportsSheet : appsScriptConfig.lookupSheet,
+    payload: JSON.stringify(payload)
+  });
+  const response = await fetch(appsScriptConfig.webAppUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+    },
+    body: body.toString()
+  });
+  if (!response.ok) {
+    throw new Error("Apps Script insert failed");
+  }
+  const result = await response.json();
+  return Boolean(result.ok);
+}
+
+async function fetchAppsScriptReports() {
+  if (!appsScriptConfig) {
     return false;
   }
   try {
-    const endpoint = `https://api.github.com/repos/${githubIssuesConfig.repo}/issues?state=all&per_page=100`;
-    const response = await fetch(endpoint, {
-      cache: "no-store",
-      headers: {
-        Accept: "application/vnd.github+json"
-      }
-    });
-    if (!response.ok) {
-      throw new Error("GitHub issues select failed");
-    }
-    const issues = await response.json();
-    const issueReports = Array.isArray(issues)
-      ? issues
-        .filter((issue) => {
-          const labels = (issue.labels || []).map((label) => label.name);
-          return !issue.pull_request
-            && (labels.includes(githubIssuesConfig.label) || /^\[Denuncia\]/i.test(issue.title || "") || /###\s*UF/i.test(issue.body || ""));
-        })
-        .map(githubIssueToReport)
-        .filter((report) => report.city)
-      : [];
-    if (issueReports.length) {
-      userReports = issueReports;
-      reports = [...issueReports];
-      remoteReportsReady = true;
-      render();
-    } else {
-      remoteReportsReady = false;
-    }
+    const rows = await fetchAppsScriptRows("reports");
+    userReports = rows.map(appScriptRowToReport);
+    reports = [...userReports];
+    remoteReportsReady = true;
+    render();
+    updateSharedStatus();
     return true;
   } catch (error) {
     remoteReportsReady = false;
+    updateSharedStatus();
+    return false;
+  }
+}
+
+async function saveAppsScriptReport(report, reportText) {
+  if (!appsScriptConfig) {
+    return false;
+  }
+  try {
+    return await postAppsScriptRow("createReport", appScriptReportToRow(report, reportText));
+  } catch (error) {
     return false;
   }
 }
@@ -252,9 +327,11 @@ async function fetchRemoteReports() {
     reports = [...userReports];
     remoteReportsReady = true;
     render();
+    updateSharedStatus();
     return true;
   } catch (error) {
     remoteReportsReady = false;
+    updateSharedStatus();
     return false;
   }
 }
@@ -360,6 +437,34 @@ function supabaseRowToLookup(row) {
   };
 }
 
+function isSharedReportsEnabled() {
+  return Boolean(appsScriptConfig || supabaseConfig);
+}
+
+function isSharedLookupsEnabled() {
+  return Boolean(appsScriptConfig || supabaseConfig);
+}
+
+function updateSharedStatus() {
+  const badge = $("#sharedSyncStatus");
+  const text = $("#sharedSyncText");
+  if (!badge || !text) {
+    return;
+  }
+  if (remoteReportsReady || remoteLookupsReady) {
+    badge.textContent = "Ativo";
+    text.textContent = "Denuncias e consultas podem ser sincronizadas entre dispositivos.";
+    return;
+  }
+  if (isSharedReportsEnabled() || isSharedLookupsEnabled()) {
+    badge.textContent = "Configurado";
+    text.textContent = "A base compartilhada esta configurada, mas ainda nao respondeu nesta carga da pagina.";
+    return;
+  }
+  badge.textContent = "Local";
+  text.textContent = "Sem backend compartilhado: os dados novos ficam apenas neste navegador ate configurar a planilha.";
+}
+
 async function fetchRemoteLookups() {
   if (!supabaseConfig) {
     return false;
@@ -379,9 +484,11 @@ async function fetchRemoteLookups() {
     lookupHistory = Array.isArray(rows) ? rows.map(supabaseRowToLookup) : [];
     remoteLookupsReady = true;
     renderLookupStats();
+    updateSharedStatus();
     return true;
   } catch (error) {
     remoteLookupsReady = false;
+    updateSharedStatus();
     return false;
   }
 }
@@ -409,6 +516,61 @@ async function saveRemoteLookup(summary, result, rawValue) {
   } catch (error) {
     return false;
   }
+}
+
+async function fetchSharedReports() {
+  if (appsScriptConfig) {
+    return fetchAppsScriptReports();
+  }
+  if (supabaseConfig) {
+    return fetchRemoteReports();
+  }
+  return false;
+}
+
+async function saveSharedReport(report, reportText) {
+  if (appsScriptConfig) {
+    return saveAppsScriptReport(report, reportText);
+  }
+  if (supabaseConfig) {
+    return saveRemoteReport(report, reportText);
+  }
+  return false;
+}
+
+async function fetchSharedLookups() {
+  if (appsScriptConfig) {
+    try {
+      const rows = await fetchAppsScriptRows("lookups");
+      lookupHistory = rows.map(appScriptRowToLookup);
+      remoteLookupsReady = true;
+      renderLookupStats();
+      updateSharedStatus();
+      return true;
+    } catch (error) {
+      remoteLookupsReady = false;
+      updateSharedStatus();
+      return false;
+    }
+  }
+  if (supabaseConfig) {
+    return fetchRemoteLookups();
+  }
+  return false;
+}
+
+async function saveSharedLookup(summary, result, rawValue) {
+  if (appsScriptConfig) {
+    try {
+      return await postAppsScriptRow("createLookup", lookupToAppScriptRow(summary, result, rawValue));
+    } catch (error) {
+      return false;
+    }
+  }
+  if (supabaseConfig) {
+    return saveRemoteLookup(summary, result, rawValue);
+  }
+  return false;
 }
 
 function loadLookupHistory() {
@@ -795,9 +957,9 @@ async function registerLookup() {
   const rawValue = $("#lookupInput").value;
   const result = riskLookup(rawValue);
   const summary = summarizeLookup(result, rawValue);
-  const savedRemote = await saveRemoteLookup(summary, result, rawValue);
+  const savedRemote = await saveSharedLookup(summary, result, rawValue);
   if (savedRemote) {
-    const refreshed = await fetchRemoteLookups();
+    const refreshed = await fetchSharedLookups();
     if (!refreshed) {
       lookupHistory.unshift(summary);
       lookupHistory = lookupHistory.slice(0, 80);
@@ -907,9 +1069,9 @@ async function addReport(event) {
   };
   submitButton.disabled = true;
   submitButton.textContent = "Enviando...";
-  const savedRemote = await saveRemoteReport(newReport, text);
+  const savedRemote = await saveSharedReport(newReport, text);
   if (savedRemote) {
-    await fetchRemoteReports();
+    await fetchSharedReports();
   } else {
     userReports.unshift(newReport);
     saveUserReports();
@@ -920,7 +1082,7 @@ async function addReport(event) {
   submitButton.textContent = savedRemote ? "Denuncia enviada" : "Salva neste navegador";
   status.textContent = savedRemote
     ? `Denuncia registrada na base compartilhada para ${newReport.city}/${newReport.uf}.`
-    : `Denuncia salva apenas neste navegador para ${newReport.city}/${newReport.uf}. Para aparecer em outros dispositivos, use o formulario do GitHub.`;
+    : `Denuncia salva apenas neste navegador para ${newReport.city}/${newReport.uf}. Configure a planilha compartilhada para sincronizar entre dispositivos.`;
   $("#classificationResult").innerHTML = `
     <div class="finding"><strong>${category}</strong><p>Tipo informado na denuncia. Sugestao automatica pelo texto: ${suggestedCategory}.</p></div>
     <div class="finding"><strong>${newReport.indicatorType}</strong><p>${newReport.indicator} registrado para ${newReport.company} em ${newReport.city}/${newReport.uf}.</p></div>
@@ -950,13 +1112,6 @@ function bindEvents() {
   $("#reportForm").addEventListener("submit", addReport);
 }
 
-function updateGithubIssueLink() {
-  const link = $("#githubIssueLink");
-  if (link && githubIssuesConfig?.issueFormUrl) {
-    link.href = githubIssuesConfig.issueFormUrl;
-  }
-}
-
 async function init() {
   loadUserReports();
   loadLookupHistory();
@@ -967,13 +1122,12 @@ async function init() {
   renderLookup();
   renderLookupStats();
   loadKnownFrauds();
-  await loadGithubIssuesConfig();
-  updateGithubIssueLink();
-  await fetchGithubIssueReports();
+  updateSharedStatus();
+  await loadAppsScriptConfig();
   await loadSupabaseConfig();
-  if (supabaseConfig) {
-    await fetchRemoteReports();
-    await fetchRemoteLookups();
+  if (appsScriptConfig || supabaseConfig) {
+    await fetchSharedReports();
+    await fetchSharedLookups();
   }
 }
 

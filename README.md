@@ -22,26 +22,40 @@ Depois acesse `http://127.0.0.1:8765/`.
 - Categoria "Phishing web" em `data/taxonomy.json` preparada para feeds de URLs suspeitas como OpenPhish e PhishTank, sem expor links ativos na pagina publica.
 - Aba "Modus Operandi" alimentada por `data/modus-operandi.json`, com busca por palavras-chave, filtro por categoria de engenharia social e resumos baseados em exemplos publicos da Febraban.
 - Formulario de denuncia com UF, cidade aberta, idade, sexo, escolaridade, empresa, tipo de golpe, tipo de identificador e prejuizo estimado.
-- Denuncias compartilhadas podem ser registradas via GitHub Issues e lidas pela pagina em todos os dispositivos; o formulario local continua como rascunho/fallback no navegador.
+- Sincronizacao compartilhada opcional via Google Sheets + Apps Script para denuncias e consultas, mantendo fallback local no navegador.
 - Classificacao simulada por regras para sugerir o enquadramento do texto e alimentar o painel.
 - Visao corporativa com monitoramento de marca, relatorios e API de risco.
 
-Os dados iniciais sao simulados. As denuncias publicadas via GitHub Issues aparecem em qualquer dispositivo quando a pagina e recarregada.
+Os dados iniciais sao simulados. Sem backend configurado, novas denuncias e consultas ficam salvas apenas no navegador local.
 
-## Coleta via GitHub Issues
+## Base compartilhada com Google Sheets
 
-O repositorio possui um Issue Form em `.github/ISSUE_TEMPLATE/denuncia.yml`. Para uma denuncia entrar na base compartilhada:
+Para que denuncias e consultas aparecam em todos os dispositivos sem usar servico pago:
 
-1. Abra a aba "Denuncia" no site.
-2. Clique em "Registrar no GitHub".
-3. Preencha o formulario estruturado e crie a issue.
-4. Recarregue a pagina do site para ler as issues publicas do repositorio.
+1. Crie uma planilha no Google Sheets.
+2. Abra `Extensoes > Apps Script`.
+3. Cole o conteudo de `docs/apps-script.gs`.
+4. Publique em `Implantar > Nova implantacao > Aplicativo da web`.
+5. Em acesso, selecione `Qualquer pessoa com o link`.
+6. Copie a URL do aplicativo da web.
+7. Edite `data/apps-script-config.json`:
 
-O site le a API publica do GitHub e converte issues de denuncia em registros do painel. Isso evita expor token no navegador e dispensa backend pago.
+```json
+{
+  "enabled": true,
+  "webAppUrl": "https://script.google.com/macros/s/SEU_ID/exec",
+  "reportsSheet": "denuncias",
+  "lookupSheet": "consultas"
+}
+```
+
+Quando `enabled` estiver como `true`, o formulario de denuncia passa a gravar na aba `denuncias` e a consulta preventiva passa a gravar na aba `consultas`. A pagina tambem recarrega essas duas abas para atualizar os paineis em outros dispositivos.
+
+As consultas continuam sendo registradas sem texto bruto: ficam tipo consultado, score, sinais, hash curto do termo e dominio quando houver URL.
 
 ## Supabase opcional
 
-O Supabase permanece como caminho opcional. Para usar:
+O Supabase permanece como caminho opcional para quem quiser uma base mais estruturada. Para usar:
 
 1. Crie um projeto no Supabase.
 2. Abra o SQL Editor e rode o script `docs/supabase-schema.sql`.
