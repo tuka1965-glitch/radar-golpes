@@ -690,6 +690,7 @@ async function loadTaxonomy() {
       return;
     }
     taxonomy = await response.json();
+    renderModusCategoryOptions();
     renderModusOperandi();
   } catch (error) {
     taxonomy = null;
@@ -712,10 +713,10 @@ async function loadModusOperandi() {
 
 function renderModusCategoryOptions() {
   const select = $("#modusCategoryFilter");
-  if (!select || !modusOperandi) {
+  if (!select) {
     return;
   }
-  const categories = Array.isArray(modusOperandi.attackCategories) ? modusOperandi.attackCategories : [];
+  const categories = Array.isArray(modusOperandi?.attackCategories) ? modusOperandi.attackCategories : [];
   select.innerHTML = `
     <option value="">Todas as categorias</option>
     ${categories.map((category) => `<option value="${escapeHtml(category.id)}">${escapeHtml(category.name)}</option>`).join("")}
@@ -773,15 +774,22 @@ function buildKnowledgeItems() {
         sourceUrl,
         attackCategory,
         attackCategoryId,
+        itemKind: "tipo",
         attackCategorySource: "Classificacao aproximada para navegacao da base",
       };
     })
     : [];
-  return [...taxonomyItems, ...modusItems];
+  return [
+    ...taxonomyItems,
+    ...modusItems.map((item) => ({
+      ...item,
+      itemKind: item.itemKind || "modus"
+    }))
+  ];
 }
 
 function renderModusOperandi() {
-  if (!modusOperandi) {
+  if (!taxonomy && !modusOperandi) {
     return;
   }
 
@@ -789,7 +797,7 @@ function renderModusOperandi() {
   const selectedCategory = $("#modusCategoryFilter")?.value || "";
   const items = buildKnowledgeItems();
   const queryTokens = query.split(/\s+/).filter(Boolean);
-  const categories = Array.isArray(modusOperandi.attackCategories) ? modusOperandi.attackCategories : [];
+  const categories = Array.isArray(modusOperandi?.attackCategories) ? modusOperandi.attackCategories : [];
   const filteredItems = items.filter((item) => {
     if (selectedCategory && item.attackCategoryId !== selectedCategory) {
       return false;
@@ -805,12 +813,12 @@ function renderModusOperandi() {
     taxonomy?.note || ""
   ].filter(Boolean);
 
-  $("#modusNote").textContent = noteParts.join(" ");
+  $("#modusNote").textContent = noteParts.join(" ") || "Descricoes resumidas de tipos de golpe e dos roteiros mais comuns usados pelos fraudadores.";
   $("#modusList").innerHTML = filteredItems.map((item) => `
     <article class="modus-card">
       <div class="modus-card-header">
         <div>
-          <span class="eyebrow">${escapeHtml(item.sourceName || "Fonte")}</span>
+          <span class="eyebrow">${escapeHtml(item.itemKind === "tipo" ? "Tipo de golpe" : (item.sourceName || "Fonte"))}</span>
           <h3>${escapeHtml(item.title)}</h3>
         </div>
         <a href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noopener">Fonte</a>
