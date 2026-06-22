@@ -690,60 +690,10 @@ async function loadTaxonomy() {
       return;
     }
     taxonomy = await response.json();
-    renderTaxonomy();
+    renderModusOperandi();
   } catch (error) {
     taxonomy = null;
   }
-}
-
-function renderTaxonomy() {
-  if (!taxonomy) {
-    return;
-  }
-  const categories = Array.isArray(taxonomy.categories) ? taxonomy.categories : [];
-  const totalCases = categories.reduce((sum, item) => sum + Number(item.knownCases || 0), 0);
-  const totalUrls = categories.reduce((sum, item) => sum + Number(item.knownUrls || 0), 0);
-  const sourceNames = (taxonomy.sources || []).map((source) => source.name).join(", ");
-
-  $("#taxonomyNote").textContent = taxonomy.note || "";
-  $("#taxonomySummary").innerHTML = `
-    <span><strong>${categories.length}</strong> tipos</span>
-    <span><strong>${totalCases.toLocaleString("pt-BR")}</strong> casos catalogados</span>
-    <span><strong>${totalUrls.toLocaleString("pt-BR")}</strong> URLs suspeitas</span>
-    <span><strong>${sourceNames || "Fontes em expansao"}</strong></span>
-  `;
-  $("#taxonomyList").innerHTML = categories.map((category) => {
-    const metricValue = Number(category.metricValue ?? category.knownCases ?? 0);
-    const metricLabel = category.metricLabel || "casos conhecidos";
-    const share = Number(category.share || 0);
-    const shareText = category.share === null || category.share === undefined
-      ? "indicador"
-      : `${share.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`;
-    return `
-    <article class="taxonomy-card ${category.knownUrls ? "indicator-source" : ""}">
-      <div class="taxonomy-card-header">
-        <div>
-          <span class="eyebrow">${metricValue.toLocaleString("pt-BR")} ${metricLabel}</span>
-          <h3>${category.name}</h3>
-        </div>
-        <strong>${shareText}</strong>
-      </div>
-      <p>${category.description}</p>
-      ${category.share === null || category.share === undefined ? "" : `<div class="taxonomy-bar" aria-hidden="true"><span style="width:${share}%"></span></div>`}
-      <div class="taxonomy-detail">
-        <div>
-          <strong>Sinais comuns</strong>
-          <p>${(category.signals || []).join(", ")}</p>
-        </div>
-        <div>
-          <strong>Exemplos</strong>
-          <p>${(category.examples || []).join(", ")}</p>
-        </div>
-      </div>
-      <p class="bias-text">${category.sourceBias}</p>
-    </article>
-  `;
-  }).join("");
 }
 
 async function loadModusOperandi() {
@@ -772,6 +722,64 @@ function renderModusCategoryOptions() {
   `;
 }
 
+function inferTaxonomyAttackCategoryId(categoryId) {
+  const categoryMap = {
+    cobranca_fatura_boleto: "phishing",
+    banco_cartao_conta: "pretexto",
+    fiscal_tributario: "phishing",
+    documento_anexo_download: "phishing",
+    email_webmail: "phishing",
+    judicial_advocacia: "pretexto",
+    outros_phishing: "phishing",
+    phishing_web: "phishing",
+    encomenda_frete: "smishing",
+    transito_cnh_detran: "smishing",
+    pontos_milhas_recompensas: "baiting",
+    doacao_premio_oferta: "baiting"
+  };
+  return categoryMap[categoryId] || "pretexto";
+}
+
+function buildKnowledgeItems() {
+  const modusItems = Array.isArray(modusOperandi?.items) ? modusOperandi.items : [];
+  const attackCategories = Array.isArray(modusOperandi?.attackCategories) ? modusOperandi.attackCategories : [];
+  const taxonomyItems = Array.isArray(taxonomy?.categories)
+    ? taxonomy.categories.map((category) => {
+      const attackCategoryId = inferTaxonomyAttackCategoryId(category.id);
+      const attackCategory = (attackCategories.find((item) => item.id === attackCategoryId) || {}).name || "Pretexto";
+      const sourceName = Array.isArray(category.sources) && category.sources.length
+        ? category.sources[0]
+        : "Taxonomia de referencia";
+      const sourceUrl = ((taxonomy?.sources || []).find((source) => source.name === sourceName) || {}).url
+        || (taxonomy?.sources || [])[0]?.url
+        || "#";
+      const details = [];
+      if ((category.signals || []).length) {
+        details.push(`Sinais comuns: ${(category.signals || []).join(", ")}`);
+      }
+      if ((category.examples || []).length) {
+        details.push(`Exemplos recorrentes: ${(category.examples || []).join(", ")}`);
+      }
+      if (category.sourceBias) {
+        details.push(category.sourceBias);
+      }
+      return {
+        id: `taxonomy-${category.id}`,
+        title: category.name,
+        summary: category.description,
+        prevention: details.join(". "),
+        keywords: [...(category.signals || []), ...(category.examples || [])],
+        sourceName,
+        sourceUrl,
+        attackCategory,
+        attackCategoryId,
+        attackCategorySource: "Classificacao aproximada para navegacao da base",
+      };
+    })
+    : [];
+  return [...taxonomyItems, ...modusItems];
+}
+
 function renderModusOperandi() {
   if (!modusOperandi) {
     return;
@@ -779,7 +787,7 @@ function renderModusOperandi() {
 
   const query = normalizeSearchText($("#modusSearch")?.value || "").trim();
   const selectedCategory = $("#modusCategoryFilter")?.value || "";
-  const items = Array.isArray(modusOperandi.items) ? modusOperandi.items : [];
+  const items = buildKnowledgeItems();
   const queryTokens = query.split(/\s+/).filter(Boolean);
   const categories = Array.isArray(modusOperandi.attackCategories) ? modusOperandi.attackCategories : [];
   const filteredItems = items.filter((item) => {
@@ -789,18 +797,15 @@ function renderModusOperandi() {
     if (!queryTokens.length) {
       return true;
     }
-    const corpus = normalizeSearchText(`${item.title} ${item.attackCategory || ""} ${item.summary} ${item.prevention} ${(item.keywords || []).join(" ")}`);
+    const corpus = normalizeSearchText(`${item.title} ${item.attackCategory || ""} ${item.summary} ${item.prevention} ${(item.keywords || []).join(" ")} ${item.sourceName || ""}`);
     return queryTokens.every((token) => corpus.includes(token));
   });
-  const sourceNames = (modusOperandi.sources || []).map((source) => source.name).join(", ");
+  const noteParts = [
+    modusOperandi.note || "",
+    taxonomy?.note || ""
+  ].filter(Boolean);
 
-  $("#modusNote").textContent = modusOperandi.note || "";
-  $("#modusSummary").innerHTML = `
-    <span><strong>${items.length}</strong> roteiros descritos</span>
-    <span><strong>${categories.length}</strong> categorias de ataque</span>
-    <span><strong>${filteredItems.length}</strong> resultado(s)</span>
-    <span><strong>${sourceNames || "Fontes em expansao"}</strong></span>
-  `;
+  $("#modusNote").textContent = noteParts.join(" ");
   $("#modusList").innerHTML = filteredItems.map((item) => `
     <article class="modus-card">
       <div class="modus-card-header">

@@ -20,8 +20,7 @@
           <button class="nav-item active" data-view="overview" type="button">Painel</button>
           <button class="nav-item" data-view="consulta" type="button">Consulta</button>
           <button class="nav-item" data-view="denuncia" type="button">Denuncia</button>
-          <button class="nav-item" data-view="tipos" type="button">Tipos de Golpes</button>
-          <button class="nav-item" data-view="modus" type="button">Modus Operandi</button>
+          <button class="nav-item" data-view="modus" type="button">Golpes</button>
         </nav>
         <div class="sidebar-panel">
           <span class="eyebrow">Assinatura</span>
@@ -317,38 +316,19 @@
           </div>
         </section>
 
-        <section class="view" id="tipos">
-          <div class="dashboard-grid">
-            <section class="panel wide">
-              <div class="section-title">
-                <div>
-                  <span class="eyebrow">Taxonomia de referencia</span>
-                  <h2>Tipos de golpes conhecidos</h2>
-                </div>
-              </div>
-              <p id="taxonomyNote" class="note-text"></p>
-              <div id="taxonomySummary" class="taxonomy-summary"></div>
-            </section>
-
-            <section class="panel wide">
-              <div id="taxonomyList" class="taxonomy-list"></div>
-            </section>
-          </div>
-        </section>
-
         <section class="view" id="modus">
           <div class="dashboard-grid">
             <section class="panel wide">
               <div class="section-title">
                 <div>
                   <span class="eyebrow">Base de conhecimento</span>
-                  <h2>Modus operandi dos golpes</h2>
+                  <h2>Tipos de golpe e modus operandi</h2>
                 </div>
               </div>
               <p id="modusNote" class="note-text"></p>
               <label class="input-block">
                 Buscar por tipo, canal, palavra-chave ou sinal do golpe
-                <input id="modusSearch" type="search" placeholder="Ex.: Pix, falso boleto, WhatsApp, senha, leilao" />
+                <input id="modusSearch" type="search" placeholder="Ex.: Pix, falso boleto, WhatsApp, banco, senha, leilao" />
               </label>
               <label class="input-block">
                 Categoria de engenharia social
@@ -356,7 +336,6 @@
                   <option value="">Todas as categorias</option>
                 </select>
               </label>
-              <div id="modusSummary" class="taxonomy-summary"></div>
             </section>
 
             <section class="panel wide">
