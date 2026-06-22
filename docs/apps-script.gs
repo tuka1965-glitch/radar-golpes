@@ -1,3 +1,5 @@
+var SPREADSHEET_ID = "1rT_Zj3toIVy0Gj719-w2Aog1gph-P0DCZzhhUxWzMWcet2B4GjokwbM4";
+
 var REPORT_HEADERS = [
   "created_at",
   "date_label",
@@ -82,7 +84,7 @@ function parsePayload_(raw) {
 }
 
 function getSheet_(sheetName) {
-  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = spreadsheet.getSheetByName(sheetName);
 
   if (!sheet) {
